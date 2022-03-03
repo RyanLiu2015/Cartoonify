@@ -1,30 +1,17 @@
-# 0. Some prerequisites to build and deploy Cartoonify 🛠
+# 0. Prerequisites to build and deploy Cartoonify 🛠
 
 If you want to run and deploy Cartoonify, here are some prerequisites first:
 
-- An AWS account (don't worry, deploying this app will cost you almost **nothing**)
+- An AWS account
 - A free account on Netlify
 - Docker installed on your machine
 - node and npm (preferably the latest versions) installed on your machine
 - torch and torchvision to test CartoonGAN locally (optional)
 
-All set? you're now ready to go.
 
-### Testing cartoonGAN on Google colab
 
-check out `cartoongan/notebooks/standalone_cartoonify.ipynb`
+# 1. Download pretrained CartoonGAN
 
-or online on [Colab](https://colab.research.google.com/drive/1Lq8mACJKP8TBxY-TJcsdyo_qul-OVdYc#scrollTo=ug2o6M2IqyAu)
-
-Please follow these four steps:
-
-# 1. Test CartoonGAN locally
-
-Some parts of the CartoonGan code as well as the pretrained models are borrowed from this [repo](https://github.com/Yijunmaverick/CartoonGAN-Test-Pytorch-Torch). A shout out to them for the great work!
-
-This is more of an exploratory step where you get to play with the pretrained models and try them (**so inference only**) on some sample images.
-
-If you're interested in the training procedure, have a look at the CartoonGAN [paper](https://openaccess.thecvf.com/content_cvpr_2018/papers/Chen_CartoonGAN_Generative_Adversarial_CVPR_2018_paper.pdf)
 
 - Download the four pretrained models first. These weights will be loaded inside the Generator model defined in **`cartoongan/network/Transformer.py`**
 
@@ -33,35 +20,22 @@ cd cartoongan
 bash download_pth.sh
 ```
 
-- To test one of the four models, head over the notebook **`cartoongan/notebooks/CartoonGAN.ipynb`** and change the input image path to your test image.
+- To test models, go to notebook **`cartoongan/notebooks/CartoonGAN.ipynb`** and change the input image path to your test image.
   This notebook calls **`cartoongan/test_from_code.py`** script to make the transformation.
 
-```bash
-cd cartoongan/notebooks
-jupyter notebook
-```
+Some parts of the CartoonGan code as well as the pretrained models are borrowed from this [repo](https://github.com/Yijunmaverick/CartoonGAN-Test-Pytorch-Torch). A shout out to them for the great work!
 
-![](./images/demo_cartoongan.png)
+This is more of an exploratory step where you get to play with the pretrained models and try them (**so inference only**) on some sample images.
 
-# 2. Deploy CartoonGAN on a serverless API using AWS Lambda
+If you're interested in the training procedure, have a look at the CartoonGAN [paper](https://openaccess.thecvf.com/content_cvpr_2018/papers/Chen_CartoonGAN_Generative_Adversarial_CVPR_2018_paper.pdf)
+
+
 
 The goal of this section is to deploy the CartoonGAN model on a serverless architecture so that it can be requested through an API endpoint ... from the internet :computer:
 
-## Why does a serverless architecture matter?
 
-In a serverless architecture using Lambda functions, for example, you don't have to provision servers yourself. Roughly speaking, you only write the code that'll be execuded and list its dependencies and AWS will manage the servers for you automatically and take care of the infrastructure.
 
-This has a lot of benefits:
-
-1. Cost efficiency: you don't have to pay for a serverless architecture when you don't use it. On the opposite, when you have an EC2 machine running and not processing any request, you still pay for it.
-
-2. Scalability: if a serverless application starts having a lot of requests at the same time, AWS will scale it by allocating more power to manage the load. If you had the manage the load by yourself using EC2 instances, you would do this by manually allocating more machines and creating a load balancer.
-
-Of course, Serverless architectures cannot be a perfect fit for any use-case. In some situations, they are not practical at all (need for real-time or quick responses, use of WebSocket, heavy processing, etc.).
-
-Since I frequently build machine learning models and integrate them into web applications, I found that a serverless architecture was interesting in these specific use-cases. Of course, here the models are used in **inference only** :warning:
-
-## Cartoonify workflow
+## 2. Cartoonify workflow
 
 Here's the architecture of the app:
 
@@ -78,6 +52,55 @@ Here's the architecture of the app:
   - The Lambda function starts running: it first fetches the pretrained models from S3 and then applies the style transformation on it
   - Once the Lambda function is done running, it sends the transformed image back to the client through API Gateway.
 
+
+
+# 3. Build a React interface
+  
+- We alreadly put the baseUrl here. If you've build your model and deploy the model, you'll have to specify the API url of the model you deployed.
+  Go inside `fontend/src/api.js` and change the value of **baseUrl**
+  You can see the last part to learn how to deploy your own model on serverless api
+
+- To run the React app locally:
+
+```bash
+cd frontend/
+yarn install
+yarn start
+```
+
+This will start it at: http://localhost:3000
+
+- To build the app before deploying it to Netlify
+
+```bash
+yarn build
+```
+
+This will create a `build/` folder that contains a build of the application to be served on Netlify.
+
+# 4. Deploy the React app on Netlify
+
+- To be able to deploy on Netlify you'll need an account. It's free, head over this [link](https://app.netlify.com/) to sign up.
+
+- Then you'll need to install **netlify-cli**
+
+```bash
+npm install netlify-cli -g
+```
+
+- Authenticate the Netlify client with your account
+
+```bash
+netlify login
+```
+
+- Deploy :rocket:
+
+```bash
+cd app/
+netlify deploy
+```
+# 5. Deploy CartoonGAN on a serverless API using AWS Lambda
 ## Deploy using the Serverless framework
 
 We are going to define and deploy this architecture by writing it as a Yaml file using the [Serverless](https://www.serverless.com/) framework: an open-source tool to automate deployment to AWS, Azure, Google Cloud, etc.
@@ -395,49 +418,3 @@ Deployment may take up to 5 - 8 minutes, so go grab a :coffee:.
 Once the lambda function deployed, **you'll be prompted a URL of the API**. Go to jupyter notebook to test it:
 
 ![](./images/demo_api.png)
-
-# 3. Build a React interface
-
-- Before running the React app and building it, you'll have to specify the API url of the model you just deployed.
-  Go inside `fontend/src/api.js` and change the value of **baseUrl**
-
-- To run the React app locally:
-
-```bash
-cd frontend/
-yarn install
-yarn start
-```
-
-This will start it at: http://localhost:3000
-
-- To build the app before deploying it to Netlify
-
-```bash
-yarn build
-```
-
-This will create a `build/` folder that contains a build of the application to be served on Netlify.
-
-# 4. Deploy the React app on Netlify
-
-- To be able to deploy on Netlify you'll need an account. It's free, head over this [link](https://app.netlify.com/) to sign up.
-
-- Then you'll need to install **netlify-cli**
-
-```bash
-npm install netlify-cli -g
-```
-
-- Authenticate the Netlify client with your account
-
-```bash
-netlify login
-```
-
-- Deploy :rocket:
-
-```bash
-cd app/
-netlify deploy
-```
