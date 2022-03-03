@@ -7,13 +7,14 @@ from PIL import Image
 
 st.set_page_config(layout="wide")
 
-url = "https://tbuxfdm545.execute-api.eu-west-3.amazonaws.com/dev/transform"
+url = "https://t06twtw4n1.execute-api.us-west-1.amazonaws.com/dev/transform"
 
 model_names = ["Hosoda", "Hayao", "Shinkai", "Paprika"]
 model_name = st.sidebar.selectbox("Select a model", options=model_names)
 
 load_size = st.sidebar.slider("Set image size", 100, 800, 300, 20)
-uploaded_image = st.sidebar.file_uploader("Upload image", type=["png", "jpg", "jpeg"])
+uploaded_image = st.sidebar.file_uploader(
+    "Upload image", type=["png", "jpg", "jpeg"])
 
 
 cols = st.beta_columns((1, 1))
@@ -44,7 +45,7 @@ if uploaded_image is not None:
         response = requests.post(url, json=data)
         delta = time.time() - t0
         image = response.json()["output"]
-        image = image[image.find(",") + 1 :]
+        image = image[image.find(",") + 1:]
         dec = base64.b64decode(image + "===")
         binary_output = BytesIO(dec)
 
