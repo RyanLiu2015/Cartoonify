@@ -1,21 +1,3 @@
-# Build and Deploy Cartoonify: a Serverless Machine Learning App
-
-This repo contains all the code needed to run, build and deploy Cartoonify: a toy app I made from scratch to turn your pictures into cartoons.
-
-<p align="center">
-  <img src="./images/demo_cartoonify.gif" width="40%">
-</p>
-
-**Here's what motivated me in starting this project:**
-
-- Give GANs a try. I've been fascinated by these models lately. Trying the CartoonGAN model to turn your face into a cartoon seemed like real fun
-
-- Learn about deploying an application on a serverless architecture using different services of AWS (Lambda, API Gateway, S3, etc.)
-
-- Practice my React skills. I was so damn bored of Plotly, Dash and Streamlit. I wanted, for once, to build something custom and less mainstream
-
-- Use Netlify to deploy this React app. I saw demos of how easy this process was and I wanted to try it to convince myself
-
 # 0. Some prerequisites to build and deploy Cartoonify 🛠
 
 If you want to run and deploy Cartoonify, here are some prerequisites first:
@@ -159,7 +141,7 @@ provider:
   name: aws
   runtime: python3.7
   profile: cartoonify
-  region: eu-west-3
+  region: us-west-1
   timeout: 60
   iamRoleStatements:
       - Effect: Allow
