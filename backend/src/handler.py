@@ -49,7 +49,7 @@ def load_models(s3, bucket):
 gpu = -1
 
 s3 = boto3.client("s3")
-bucket = "cartoonify295"
+bucket = "cartoonify295capstone"
 
 mapping_id_to_style = {0: "Hosoda", 1: "Hayao", 2: "Shinkai", 3: "Paprika"}
 

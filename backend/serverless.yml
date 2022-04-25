@@ -23,7 +23,7 @@ provider:
     - Effect: Allow
       Action:
         - s3:getObject
-      Resource: arn:aws:s3:::cartoonify295/models/*
+      Resource: arn:aws:s3:::cartoonify295capstone/models/*
     - Effect: Allow
       Action:
         - "lambda:InvokeFunction"
