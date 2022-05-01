@@ -39,6 +39,6 @@ func (obj *UserDataAccessObject) InsertNewUser(user User) {
 	obj.db.Select("Username", "Password", "Email").Create(&user)
 }
 
-func (obj *UserDataAccessObject) ValidateExistingUser() {
-
+func (obj *UserDataAccessObject) ValidateExistingUser() error {
+	return nil
 }

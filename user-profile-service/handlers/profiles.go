@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/RyanLiu2015/Cartoonify/user-profile-serivce/data-access"
@@ -59,10 +60,10 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			p.l.Printf("error decoding body json: %s", err)
 		}
-		fmt.Printf("method=%s\n", userProfileParams.Method)
-		fmt.Printf("username=%s\n", userProfileParams.UserCredentials.Username)
-		fmt.Printf("password=%s\n", userProfileParams.UserCredentials.Password)
-		fmt.Printf("email=%s\n", userProfileParams.UserCredentials.Email)
+		//fmt.Printf("method=%s\n", userProfileParams.Method)
+		//fmt.Printf("username=%s\n", userProfileParams.UserCredentials.Username)
+		//fmt.Printf("password=%s\n", userProfileParams.UserCredentials.Password)
+		//fmt.Printf("email=%s\n", userProfileParams.UserCredentials.Email)
 
 		if userProfileParams.Method == "signup" {
 			fmt.Println("calling signup function")
@@ -83,4 +84,12 @@ func (p *ProfileHandler) Signup(rw http.ResponseWriter, req *http.Request, cred 
 		Password: cred.Password,
 		Email:    cred.Email,
 	})
+
+	// write response body
+	ret := UserProfileRet{
+		0, "ok",
+	}
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(ret)
+	rw.Write(b.Bytes())
 }
