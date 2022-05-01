@@ -1,34 +1,75 @@
-package user_profile_service
+package main
 
 import (
 	"context"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/nicholasjackson/env"
+	"github.com/RyanLiu2015/Cartoonify/user-profile-serivce/data-access"
+	"github.com/RyanLiu2015/Cartoonify/user-profile-serivce/handlers"
+	"github.com/gorilla/mux"
 )
 
-var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
+func readConfig() tomlConfig {
+	f := "config.toml"
+	var conf tomlConfig
+	_, err := toml.DecodeFile(f, &conf)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	mysqlConf := conf.MysqlConfig
+	serverConf := conf.ServerConfig
+
+	fmt.Println("Server config:")
+	fmt.Printf("Host: %s\n", serverConf.Host)
+	fmt.Printf("Port: %d\n", serverConf.Port)
+
+	fmt.Println("Mysql config:")
+	fmt.Printf("Host: %s\n", mysqlConf.Host)
+	fmt.Printf("Port: %d\n", mysqlConf.Port)
+	fmt.Printf("User: %s\n", mysqlConf.User)
+	fmt.Printf("Password: %s\n", mysqlConf.Password)
+	fmt.Printf("DB Name: %s\n", mysqlConf.DBName)
+	return conf
+}
 
 func main() {
-	fmt.Println("Initializing user profile service")
 
+	fmt.Println("Initializing user profile service... ")
 	l := log.New(os.Stdout, "[User Profile Service] ", log.LstdFlags)
 
-	// profiles handler
-	ph := handlers.NewProducts(l)
+	conf := readConfig()
 
-	sm := http.NewServeMux()
-	sm.Handle("/", ph)
+	dao, err := data_access.InitializeDatabase(conf.MysqlConfig)
+	if err != nil {
+		l.Printf("Error Initializing database access: %s\n", err)
+		os.Exit(1)
+	}
+	//dao.InsertNewUser(data_access.User{
+	//	Username: "Jimmy",
+	//	Password: "Hash",
+	//	Email:    "jimmy@123.com",
+	//})
+
+	addr := fmt.Sprintf("%s:%d", conf.ServerConfig.Host, conf.ServerConfig.Port)
+
+	// profiles handler
+	ph := handlers.NewProfileHandler(l, dao)
+
+	router := mux.NewRouter()
+	router.Handle("/user", ph)
 
 	// create a new server
 	s := http.Server{
-		Addr:         *bindAddress,      // configure the bind address
-		Handler:      sm,                // set the default handler
+		Addr:         addr,              // configure the bind address
+		Handler:      router,            // set the default handler
 		ErrorLog:     l,                 // set the logger for the server
 		ReadTimeout:  5 * time.Second,   // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
@@ -37,7 +78,7 @@ func main() {
 
 	// start the server
 	go func() {
-		l.Println("Starting server on port 9090")
+		l.Printf("Starting server on Port %d", conf.ServerConfig.Host)
 
 		err := s.ListenAndServe()
 		if err != nil {
@@ -46,7 +87,7 @@ func main() {
 		}
 	}()
 
-	// trap sigterm or interupt and gracefully shutdown the server
+	// trap sigterm or interrupt and gracefully shutdown the server
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, os.Kill)
