@@ -1,6 +1,5 @@
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import List from "./pages/List";
 import Helmet from "react-helmet";
 import { Routes, Route, Link } from "react-router-dom";

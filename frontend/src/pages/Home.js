@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-
+import {
+  useNavigate,
+} from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 import StyleSelector from "../components/StyleSelector.js";
@@ -52,7 +54,7 @@ export default function Home() {
   const [percentage, setPercentage] = useState(0.5);
   const [modelID, setModelID] = useState(0);
   const [open, setOpen] = useState(false);
-
+  let navigate = useNavigate();
   useEffect(() => {
     toDataUrl(beforePlaceholder, (base64) => {
       setBefore(base64);
@@ -68,6 +70,34 @@ export default function Home() {
   const classes = useStyles();
   return (
     <Box align="center">
+      <div style={{
+        textAlign: 'center',
+        height: 40,
+        background: 'black',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        width: '100%'
+      }}>
+        <a onClick={() => {
+          navigate('/login')
+        }} style={{
+          marginRight: 40
+        }}>To Login</a>
+        <a onClick={() => {
+          navigate('/list')
+        }}>To List</a>
+      </div>
+      <div style={{
+        height: 50
+      }}>
+
+      </div>
+
       <div style={{ textAlign: "center", width: "100%" }}>
         <img src={logo} className={classes.logo} />
       </div>
