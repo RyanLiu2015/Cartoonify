@@ -42,18 +42,16 @@ type UserProfileRet struct {
 // ServeHTTP is the main entry point for the handler and satisfies the http.Handler
 // interface
 func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	// handle the request for a list of products
-	//if r.Method == http.MethodGet {
-	//	p.getProfiles(rw, r)
-	//	return
-	//}
 
-	//fmt.Println("ServerHTTP  1234")
+	//fmt.Println("ServerHTTP function")
 	//b, err := io.ReadAll(req.Body)
 	//if err != nil {
 	//	p.l.Fatalln(err)
 	//}
 	//fmt.Println(string(b))
+
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+
 	if req.Method == http.MethodPost {
 		fmt.Println("post received lmao")
 		decoder := json.NewDecoder(req.Body)
@@ -97,7 +95,6 @@ func (p *ProfileHandler) Signup(rw http.ResponseWriter, req *http.Request, cred 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(ret)
 	rw.Write(b.Bytes())
-	rw.WriteHeader(http.StatusOK)
 }
 
 func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, cred UserCredentials) {
@@ -116,5 +113,4 @@ func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, cred 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(ret)
 	rw.Write(b.Bytes())
-	rw.WriteHeader(http.StatusOK)
 }
