@@ -47,6 +47,8 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	//	p.getProfiles(rw, r)
 	//	return
 	//}
+
+	//fmt.Println("ServerHTTP  1234")
 	//b, err := io.ReadAll(req.Body)
 	//if err != nil {
 	//	p.l.Fatalln(err)
@@ -68,6 +70,9 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if userProfileParams.Method == "signup" {
 			fmt.Println("calling signup function")
 			p.Signup(rw, req, userProfileParams.UserCredentials)
+		} else if userProfileParams.Method == "signin" {
+			fmt.Println("calling signin function")
+			p.SignIn(rw, req, userProfileParams.UserCredentials)
 		}
 		return
 	}
@@ -92,4 +97,24 @@ func (p *ProfileHandler) Signup(rw http.ResponseWriter, req *http.Request, cred 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(ret)
 	rw.Write(b.Bytes())
+	rw.WriteHeader(http.StatusOK)
+}
+
+func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, cred UserCredentials) {
+	_, err := p.dao.ValidateExistingUser(data_access.User{
+		Username: cred.Username,
+		Password: cred.Password,
+	})
+	// write response body
+	ret := UserProfileRet{
+		0, "ok",
+	}
+	if err != nil {
+		ret.Errcode = 1
+		ret.Errmsg = err.Error()
+	}
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(ret)
+	rw.Write(b.Bytes())
+	rw.WriteHeader(http.StatusOK)
 }
