@@ -71,6 +71,7 @@ export default function Home() {
       <div style={{ textAlign: "center", width: "100%" }}>
         <img src={logo} className={classes.logo} />
       </div>
+      
       <div className={classes.holder}>
         <StyleSelector
           modelID={modelID}
