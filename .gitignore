@@ -11,3 +11,6 @@ cache
 *.onnx
 *.pth
 .vscode
+
+user-profile-service/config.toml
+user-profile-service/.idea/
