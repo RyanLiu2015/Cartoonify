@@ -64,7 +64,7 @@ func main() {
 	ph := handlers.NewProfileHandler(l, dao)
 
 	router := mux.NewRouter()
-	router.Handle("/user", ph)
+	router.Handle("/user", ph).Methods("POST, GET, OPTIONS, PUT, DELETE")
 
 	// create a new server
 	s := http.Server{

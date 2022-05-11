@@ -50,7 +50,8 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	//}
 	//fmt.Println(string(b))
 
-	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+	rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	if req.Method == http.MethodPost {
 		fmt.Println("post received lmao")
@@ -113,4 +114,8 @@ func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, cred 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(ret)
 	rw.Write(b.Bytes())
+}
+
+func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request) {
+
 }
