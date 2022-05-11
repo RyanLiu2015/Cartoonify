@@ -27,13 +27,25 @@ export default function Login() {
             // to login
             if (username && pwd) {
                 // alert(pwd);
-                const xhttp = new XMLHttpRequest();
-                const url = "";
-                xhttp.open('GET', url);
-                xhttp.send();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        alert(xhttp.responseText);
+                const xhr = new XMLHttpRequest();
+                const url = "http://localhost:42069/user";
+                xhr.open('POST', url);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                var sendJson = JSON.stringify(
+                    {
+                        "method": "signin",
+                        "user-credentials": {
+                            "username": username,
+                            "password": pwd
+                        }
+
+                    });
+                xhr.send(sendJson);
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        console.log(response);
+                        alert(response);
                     }
                 }
             }
@@ -58,13 +70,24 @@ export default function Login() {
                 return;
             }
             if (username && pwd && cPwd && email && regEmail.test(email)) {
-                const xhttp = new XMLHttpRequest();
-                const url = "";
-                xhttp.open('GET', url);
-                xhttp.send();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        alert(xhttp.responseText);
+                const xhr = new XMLHttpRequest();
+                const url = "http://localhost:42069/user";
+                xhr.open('POST', url);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                var sendjson = JSON.stringify(
+                    {
+                        "method": "signup",
+                        "user-credentials": {
+                            "username": username,
+                            "password": pwd,
+                            "email": email
+                        }
+                    });
+                xhr.send(sendjson);
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        alert(response);
                     }
                 }
             }
