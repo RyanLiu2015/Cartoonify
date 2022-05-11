@@ -38,18 +38,20 @@ export default function Login() {
                             "username": username,
                             "password": pwd
                         }
-
                     });
                 xhr.send(sendJson);
+                // var response = JSON.parse(xhr.response);
+                // alert(response);
+
                 xhr.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         const response = JSON.parse(xhr.responseText);
-                        console.log(response);
-                        alert(response);
+                        console.log(response.Errcode);
+                        console.log(response.Errmsg);
+                        alert(xhr.responseText);
                     }
                 }
             }
-            
         } else {
             // to register
             if (!cPwd) {
@@ -87,7 +89,9 @@ export default function Login() {
                 xhr.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         const response = JSON.parse(xhr.responseText);
-                        alert(response);
+                        console.log(response.Errcode);
+                        console.log(response.Errmsg);
+                        alert(xhr.responseText);
                     }
                 }
             }
