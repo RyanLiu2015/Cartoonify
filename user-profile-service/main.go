@@ -78,7 +78,7 @@ func main() {
 
 	// start the server
 	go func() {
-		l.Printf("Starting server on Port %d", conf.ServerConfig.Host)
+		l.Printf("Starting server %s on Port %d", conf.ServerConfig.Host, conf.ServerConfig.Port)
 
 		err := s.ListenAndServe()
 		if err != nil {

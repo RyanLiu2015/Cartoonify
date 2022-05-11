@@ -1,6 +1,7 @@
 package data_access
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -39,6 +40,13 @@ func (obj *UserDataAccessObject) InsertNewUser(user User) {
 	obj.db.Select("Username", "Password", "Email").Create(&user)
 }
 
-func (obj *UserDataAccessObject) ValidateExistingUser() error {
-	return nil
+func (obj *UserDataAccessObject) ValidateExistingUser(inUser User) (bool, error) {
+	var outUser User
+	result := obj.db.Where("username = ?", fmt.Sprintf(inUser.Username)).First(&outUser)
+	if result.RowsAffected == 0 {
+		return false, errors.New(fmt.Sprintf("username '%s' not found\n", inUser.Username))
+	} else if outUser.Password != inUser.Password {
+		return false, errors.New("password hash don't match")
+	}
+	return true, nil
 }
