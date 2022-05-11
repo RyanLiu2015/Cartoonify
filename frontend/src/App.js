@@ -1,5 +1,8 @@
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import List from "./pages/List";
 import Helmet from "react-helmet";
+import { Routes, Route, Link } from "react-router-dom";
 
 function App() {
   return (
@@ -11,7 +14,11 @@ function App() {
           }
         </style>
       </Helmet>
-      <Home />
+      <Routes>
+        <Route path="/*" element={<Home />} />
+        <Route path="login" element={<Login />} />
+        <Route path="list" element={<List />} />
+      </Routes>
     </div>
   );
 }
