@@ -50,7 +50,8 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	//}
 	//fmt.Println(string(b))
 
-	rw.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	if req.Method == http.MethodPost {
