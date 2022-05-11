@@ -1,0 +1,102 @@
+.box {
+
+}
+
+.listBox{
+    width: 80%;
+    margin: auto;
+}
+
+.listItem{
+    margin-bottom: 40px;
+}
+
+.itemTop{
+    height: 290px;
+    background: #cccccc;
+    border-radius: 10px;
+}
+
+.likeBox{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    color: #666;
+}
+.likeLeft{
+    display: flex;
+    align-items: center;
+}
+.userBox{
+    display: flex;
+    justify-content: space-between;
+}
+.userLeft{
+    display: flex;
+    align-items: center;
+}
+.userLeft img{
+    margin-right: 10px;
+}
+.iconBox{
+    font-size: 0;
+    background: deeppink;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+.userRight{
+    display: flex;
+}
+.remarkBox{
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    padding-top: 8px;
+}
+.remarkBox img{
+    margin-right: 10px;
+}
+
+.iputItem {
+    /* height: 30px; */
+    border-radius: 20px;
+    outline: none;
+    /* border: 1px solid #666; */
+    border: none;
+    width: 80%;
+    padding: 5px 10px;
+    margin-bottom: 30px;
+    background: #ddd;
+    margin-top: 10px;
+}
+.padding{
+    height: 100px;
+}
+.headerBox{
+    height: 50px;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+}
+.headCenter{
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.headerTit{
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
