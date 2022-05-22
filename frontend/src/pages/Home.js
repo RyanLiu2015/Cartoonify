@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-
+import {
+  useNavigate,
+} from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 import StyleSelector from "../components/StyleSelector.js";
@@ -19,6 +21,8 @@ import logo from "../images/logo.svg";
 import { triggerBase64Download } from "react-base64-downloader";
 import { transform } from "../api.js";
 import { toDataUrl } from "../utils.js";
+import menu from '../images/menu.png'
+import sty from './home.module.css';
 
 const LOAD_SIZE = 450;
 const WIDTH = 400;
@@ -47,12 +51,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home() {
+  const username = window.localStorage.username;
   const [before, setBefore] = useState("");
   const [after, setAfter] = useState("");
   const [percentage, setPercentage] = useState(0.5);
   const [modelID, setModelID] = useState(0);
   const [open, setOpen] = useState(false);
-
+  let navigate = useNavigate();
+  let [menuActive, setMenuActive] = useState(false);
   useEffect(() => {
     toDataUrl(beforePlaceholder, (base64) => {
       setBefore(base64);
@@ -68,9 +74,71 @@ export default function Home() {
   const classes = useStyles();
   return (
     <Box align="center">
+      <div className={sty.headerBox}>
+        <div className={sty.headCenter}>
+          <div className={sty.headerTit}>
+            Cartoonity
+          </div>
+
+          <div style={{
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            fontWeight: 'bold'
+          }}>
+            {username && (
+              <span style={{
+                marginRight: 15
+              }}>{username}</span>
+            )}
+            <img onClick={() => {
+              setMenuActive(!menuActive)
+            }} style={{
+              width: 30
+            }} src={menu} />
+          </div>
+        </div>
+        <div style={{
+          transform: `translate(0, ${menuActive ? '0' : '-100%'})`
+        }} className={sty.headNavBox}>
+          <div onClick={() => {
+            navigate('/')
+          }} className={sty.headNavItem}>
+            Index
+          </div>
+          <div onClick={() => {
+            navigate('/login')
+          }} className={sty.headNavItem}>
+            Login/Register
+          </div>
+          <div onClick={() => {
+            navigate('/list')
+          }} className={sty.headNavItem}>
+            feed
+          </div>
+          {username && (
+            <div onClick={() => {
+              window.localStorage.removeItem("username")
+              navigate('/login')
+
+            }} style={{
+              textAlign: 'center',
+              color: 'red'
+            }} className={sty.headNavItem}>
+              退出
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={sty.padding}>
+
+      </div>
+
       <div style={{ textAlign: "center", width: "100%" }}>
         <img src={logo} className={classes.logo} />
       </div>
+
       <div className={classes.holder}>
         <StyleSelector
           modelID={modelID}

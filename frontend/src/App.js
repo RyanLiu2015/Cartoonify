@@ -1,6 +1,6 @@
 import Home from "./pages/Home";
+// import Entry from "./pages/Entry";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import List from "./pages/List";
 import Helmet from "react-helmet";
 import { Routes, Route, Link } from "react-router-dom";
@@ -17,8 +17,8 @@ function App() {
       </Helmet>
       <Routes>
         <Route path="/*" element={<Home />} />
+        {/* <Route path="entry" element={<Entry />}/> */}
         <Route path="login" element={<Login />} />
-        {/* <Route path="register" element={<Register />} /> */}
         <Route path="list" element={<List />} />
       </Routes>
     </div>
