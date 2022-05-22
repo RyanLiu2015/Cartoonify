@@ -14,3 +14,4 @@ cache
 
 user-profile-service/config.toml
 user-profile-service/.idea/
+user-profile-service/feed-images/*

@@ -43,20 +43,17 @@ func readConfig() tomlConfig {
 func main() {
 
 	fmt.Println("Initializing user profile service... ")
+	path, _ := os.Getwd()
+	fmt.Printf("Working directory: %s\n", path)
+
 	l := log.New(os.Stdout, "[User Profile Service] ", log.LstdFlags)
 
 	conf := readConfig()
-
 	dao, err := data_access.InitializeDatabase(conf.MysqlConfig)
 	if err != nil {
 		l.Printf("Error Initializing database access: %s\n", err)
 		os.Exit(1)
 	}
-	//dao.InsertNewUser(data_access.User{
-	//	Username: "Jimmy",
-	//	Password: "Hash",
-	//	Email:    "jimmy@123.com",
-	//})
 
 	addr := fmt.Sprintf("%s:%d", conf.ServerConfig.Host, conf.ServerConfig.Port)
 
@@ -74,6 +71,7 @@ func main() {
 		ReadTimeout:  5 * time.Second,   // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
 		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
+
 	}
 
 	// start the server
