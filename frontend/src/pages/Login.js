@@ -43,10 +43,10 @@ export default function Login() {
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 var sendJson = JSON.stringify(
                     {
-                        "method": "signin",
-                        "user-credentials": {
-                            "username": username,
-                            "password": pwd
+                        "dynamic-field": {
+                         "method": "signin",
+                         "username": username,
+                         "password": pwd
                         }
                     });
                 xhr.send(sendJson);
@@ -88,11 +88,11 @@ export default function Login() {
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 var sendjson = JSON.stringify(
                     {
-                        "method": "signup",
-                        "user-credentials": {
-                            "username": username,
-                            "password": pwd,
-                            "email": email
+                        "dynamic-field": {
+                         "method": "signup",
+                         "username": username,
+                         "password": pwd,
+                         "email": email
                         }
                     });
                 xhr.send(sendjson);

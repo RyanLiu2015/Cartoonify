@@ -77,7 +77,7 @@ export default function Home() {
       <div className={sty.headerBox}>
         <div className={sty.headCenter}>
           <div className={sty.headerTit}>
-            Cartoonity
+            Cartoonify
           </div>
 
           <div style={{
@@ -104,7 +104,7 @@ export default function Home() {
           <div onClick={() => {
             navigate('/')
           }} className={sty.headNavItem}>
-            Index
+            Home
           </div>
           <div onClick={() => {
             navigate('/login')
@@ -114,7 +114,7 @@ export default function Home() {
           <div onClick={() => {
             navigate('/list')
           }} className={sty.headNavItem}>
-            feed
+            Feed
           </div>
           {username && (
             <div onClick={() => {
