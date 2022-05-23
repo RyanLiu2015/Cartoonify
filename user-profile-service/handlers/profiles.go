@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // ProfileHandler is a http.Handler
@@ -56,6 +57,13 @@ type FeedCredentials struct {
 	ShareCount         int    `json:"share_count"`
 }
 
+type CommentCredentials struct {
+	Method      string `json:"method"`
+	FeedId      int    `json:"feed-id"`
+	CommenterId int    `json:"commenter-id"`
+	Content     string `json:"content"`
+}
+
 type RetrieveFeedParams struct {
 	Method string `json:"method"`
 	Page   int    `json:"page"`
@@ -91,6 +99,8 @@ func (d *DynamicType) UnmarshalJSON(data []byte) error {
 		d.Value = new(RetrieveFeedParams)
 	case "upvote":
 		d.Value = new(FeedCredentials)
+	case "comment":
+		d.Value = new(CommentCredentials)
 	}
 	return json.Unmarshal(data, d.Value)
 }
@@ -141,6 +151,9 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case *RetrieveFeedParams:
 			retrieveFeedParams := *params.DynamicField.Value.(*RetrieveFeedParams)
 			p.RetrieveFeedsByPage(rw, req, retrieveFeedParams)
+		case *CommentCredentials:
+			commentCredentials := *params.DynamicField.Value.(*CommentCredentials)
+			p.PostNewComment(rw, req, commentCredentials)
 		default:
 			p.l.Fatalln("unknown type")
 		}
@@ -187,7 +200,7 @@ func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, crede
 }
 
 func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
-	p.dao.InsertNewFeed(data_access.Feed{
+	newFeedId := p.dao.InsertNewFeed(data_access.Feed{
 		AuthorId:           credentials.AuthorId,
 		ResourceIdentifier: credentials.ResourceIdentifier,
 	})
@@ -195,6 +208,7 @@ func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, 
 	ret := map[string]string{
 		"errcode": "0",
 		"errmsg":  "ok",
+		"feed-id": strconv.Itoa(newFeedId),
 	}
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(ret)
@@ -211,6 +225,22 @@ func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.R
 func (p *ProfileHandler) UpvoteFeed(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
 	p.dao.IncrementFeedUpvote(credentials.Fid)
 	// write response body
+	ret := map[string]string{
+		"errcode": "0",
+		"errmsg":  "ok",
+	}
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(ret)
+	rw.Write(b.Bytes())
+}
+
+func (p *ProfileHandler) PostNewComment(rw http.ResponseWriter, req *http.Request, credentials CommentCredentials) {
+	p.dao.InsertNewComment(data_access.Comment{
+		FeedId:      credentials.FeedId,
+		CommenterId: credentials.CommenterId,
+		Content:     credentials.Content,
+	})
+
 	ret := map[string]string{
 		"errcode": "0",
 		"errmsg":  "ok",

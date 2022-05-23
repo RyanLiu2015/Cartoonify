@@ -15,10 +15,25 @@ type Feed struct {
 	CommentCount       int    `json:"comment-count"`
 	ShareCount         int    `json:"share-count"`
 	CreatedAt          string `json:"created-at"`
+
+	FirstCommentContent   string `json:"first-comment-content"`
+	FirstCommentCommenter string `json:"first-comment-commenter"`
 }
 
-func (obj *UserDataAccessObject) InsertNewFeed(feed Feed) {
+type Comment struct {
+	Cid         int    `json:"cid"`
+	FeedId      int    `json:"feed-id"`
+	CommenterId int    `json:"commenter-id"`
+	Content     string `json:"content"`
+	CreatedAt   string `json:"created-at"`
+}
+
+// InsertNewFeed return feed id
+func (obj *UserDataAccessObject) InsertNewFeed(feed Feed) int {
 	obj.db.Select("author_id", "resource_identifier").Create(&feed)
+	var reSelectFeed Feed
+	obj.db.Where(&Feed{AuthorId: feed.AuthorId}).Order("created_at DESC").First(&reSelectFeed)
+	return reSelectFeed.Fid
 }
 
 func (obj *UserDataAccessObject) GetFeedsByPage(page int) []Feed {
@@ -34,6 +49,19 @@ func (obj *UserDataAccessObject) GetFeedsByPage(page int) []Feed {
 	for i := 0; i < len(ret); i = i + 1 {
 		ret[i].AuthorUsername = authors[i].Username
 	}
+	//for _, elem := range ret {
+	for i := 0; i < len(ret); i = i + 1 {
+		thisFirstComment, err := obj.GetFirstComment(ret[i].Fid)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		ret[i].FirstCommentContent = thisFirstComment.Content
+		var thisUser User
+		obj.db.Table("users").Where(&User{Uid: thisFirstComment.CommenterId}).First(&thisUser)
+		ret[i].FirstCommentCommenter = thisUser.Username
+		fmt.Printf("%s : %s", ret[i].FirstCommentCommenter, ret[i].FirstCommentContent)
+	}
 	return ret
 }
 
@@ -43,3 +71,20 @@ func (obj *UserDataAccessObject) IncrementFeedUpvote(fid int) {
 	var currentUpvote int = feed.UpvoteCount
 	obj.db.Model(&Feed{}).Where("fid = ?", fid).Update("upvote_count", currentUpvote+1)
 }
+
+func (obj *UserDataAccessObject) GetFirstComment(fid int) (*Comment, error) {
+	var firstComment Comment
+	err := obj.db.Where(&Comment{FeedId: fid}).Order("created_at ASC").First(&firstComment).Error
+	//if obj.db.RowsAffected != 1 {
+	//	return nil, errors.New(fmt.Sprintf("error retrieving first comment, rows affected =%d", obj.db.RowsAffected))
+	//}
+	return &firstComment, err
+}
+
+func (obj *UserDataAccessObject) InsertNewComment(comment Comment) {
+	obj.db.Select("feed_id", "commenter_id", "content").Create(&comment)
+}
+
+//func RetrieveCommentsByFeed(fid int) []Comment {
+//
+//}
