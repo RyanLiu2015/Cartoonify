@@ -3,11 +3,23 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   useNavigate,
 } from "react-router-dom";
+
+import Header from '../components/Header.js';
+import Logo from "../components/Logo.js";
+
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 import StyleSelector from "../components/StyleSelector.js";
 import Backdrop from "@material-ui/core/Backdrop";
 import DownloadIcon from "@material-ui/icons/GetApp";
+
+import ShareIcon from '@material-ui/icons/Share';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import ImageUploader from "react-images-upload";
 import ReactCompareImage from "react-compare-image";
@@ -16,13 +28,10 @@ import * as loadImage from "blueimp-load-image";
 import GridLoader from "react-spinners/GridLoader";
 import beforePlaceholder from "../images/before.jpg";
 import afterPlaceholder from "../images/after.jpg";
-import logo from "../images/logo.svg";
 
 import { triggerBase64Download } from "react-base64-downloader";
 import { transform } from "../api.js";
 import { toDataUrl } from "../utils.js";
-import menu from '../images/menu.png'
-import sty from './home.module.css';
 
 const LOAD_SIZE = 450;
 const WIDTH = 400;
@@ -38,15 +47,17 @@ const useStyles = makeStyles((theme) => ({
     margin: 10,
   },
   chip: {
-    width: 200,
+    width: 120,
     backgroundColor: "#e63946",
     margin: 10,
     fontWeight: "bold",
   },
-  logo: {
-    width: WIDTH * 0.8,
+  img: {
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "auto",
     marginTop: 10,
-    marginLeft: 20,
+    marginBottom: 10,
   },
 }));
 
@@ -57,6 +68,9 @@ export default function Home() {
   const [percentage, setPercentage] = useState(0.5);
   const [modelID, setModelID] = useState(0);
   const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [content, setContent] = useState("");
+
   let navigate = useNavigate();
   let [menuActive, setMenuActive] = useState(false);
   useEffect(() => {
@@ -71,73 +85,50 @@ export default function Home() {
     });
   }, []);
 
+  const handleOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleShareFeed = () => {
+    if (!after) {
+      alert('no image shared!')
+      return;
+    }
+    const xhr = new XMLHttpRequest();
+    const url = "http://localhost:42069/user";
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    var sendImg = JSON.stringify(
+      {
+        "dynamic-field": {
+          "method": "postnew",
+          "author_id": 8,
+          "resource_identifier": after
+        }
+      });
+    xhr.send(sendImg);
+
+    xhr.onreadystatechange = function() {
+      if (this.readyState === 4 && this.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          console.log(response.Errcode);
+          console.log(response.Errmsg);
+          alert(xhr.responseText);
+      }
+  }
+
+    setDialogOpen(false);
+  };
+
   const classes = useStyles();
   return (
     <Box align="center">
-      <div className={sty.headerBox}>
-        <div className={sty.headCenter}>
-          <div className={sty.headerTit}>
-            Cartoonify
-          </div>
-
-          <div style={{
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            fontWeight: 'bold'
-          }}>
-            {username && (
-              <span style={{
-                marginRight: 15
-              }}>{username}</span>
-            )}
-            <img onClick={() => {
-              setMenuActive(!menuActive)
-            }} style={{
-              width: 30
-            }} src={menu} />
-          </div>
-        </div>
-        <div style={{
-          transform: `translate(0, ${menuActive ? '0' : '-100%'})`
-        }} className={sty.headNavBox}>
-          <div onClick={() => {
-            navigate('/')
-          }} className={sty.headNavItem}>
-            Home
-          </div>
-          <div onClick={() => {
-            navigate('/login')
-          }} className={sty.headNavItem}>
-            Login/Register
-          </div>
-          <div onClick={() => {
-            navigate('/list')
-          }} className={sty.headNavItem}>
-            Feed
-          </div>
-          {username && (
-            <div onClick={() => {
-              window.localStorage.removeItem("username")
-              navigate('/login')
-
-            }} style={{
-              textAlign: 'center',
-              color: 'red'
-            }} className={sty.headNavItem}>
-              退出
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className={sty.padding}>
-
-      </div>
-
-      <div style={{ textAlign: "center", width: "100%" }}>
-        <img src={logo} className={classes.logo} />
-      </div>
+      <Header />
+      <Logo />
 
       <div className={classes.holder}>
         <StyleSelector
@@ -212,6 +203,43 @@ export default function Home() {
             triggerBase64Download(after, "styled_image");
           }}
         />
+
+        <Chip
+          color="secondary"
+          label="Share"
+          className={classes.chip}
+          icon={<ShareIcon style={{ marginTop: 4 }} />}
+          onClick={handleOpen}
+        />
+        <Dialog open={dialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Share to Feed</DialogTitle>
+          <DialogContent>
+            <img src={after} className={classes.img} />
+            <TextField
+              autoFocus
+              id="outlined-multiline-static"
+              label="Text Content"
+              multiline
+              fullWidth
+              rows={4}
+              placeholder="Share your cartoonified image with optional text content here . . ."
+              value={content}
+              onChange={(e) => {
+                setContent(e.target.value)
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Close
+            </Button>
+            <Button onClick={handleShareFeed} color="primary">
+              Share
+            </Button>
+          </DialogActions>
+        </Dialog>
+        
+      
       </div>
       <Backdrop
         open={open}

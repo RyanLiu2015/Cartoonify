@@ -12,4 +12,16 @@ function toDataUrl(url, callback) {
   xhr.send();
 }
 
-export { toDataUrl };
+function toPost(type, url, data, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open(type, url);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(data);
+  xhr.onreadystatechange = function() {
+    if (this.status === 200 && this.readyState === 4) {
+      callback(this.response);
+    }
+  };
+}
+
+export { toDataUrl, toPost };

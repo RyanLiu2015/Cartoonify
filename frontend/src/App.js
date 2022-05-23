@@ -1,7 +1,7 @@
 import Home from "./pages/Home";
 // import Entry from "./pages/Entry";
 import Login from "./pages/Login";
-import List from "./pages/List";
+import Feed from "./pages/Feed";
 import Helmet from "react-helmet";
 import { Routes, Route, Link } from "react-router-dom";
 
@@ -19,7 +19,7 @@ function App() {
         <Route path="/*" element={<Home />} />
         {/* <Route path="entry" element={<Entry />}/> */}
         <Route path="login" element={<Login />} />
-        <Route path="list" element={<List />} />
+        <Route path="feed" element={<Feed />} />
       </Routes>
     </div>
   );

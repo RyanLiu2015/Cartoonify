@@ -4,7 +4,9 @@ import sty from './login.module.css';
 import {
     useNavigate,
 } from "react-router-dom";
-import logo from '../images/logo.svg';
+
+import Header from '../components/Header.js';
+import Logo from "../components/Logo.js";
 
 const WIDTH = 400;
 const useStyles = makeStyles((theme) => ({
@@ -113,16 +115,10 @@ export default function Login() {
     const classes = useStyles();
     return (
         <div className={sty.box}>
+            <Header />
+            <Logo />
+            
             <div className={sty.loginBox}>
-            <div style={{ textAlign: "center", width: "100%" }}>
-                    <img 
-                        src={logo} 
-                        className={classes.logo} 
-                        onClick={() => {
-                            navigate("/")
-                        }}
-                    />
-                </div>
                 <h1 className={sty.h1}>{isLogin ? 'Login' : 'Register'}</h1>
 
                 <input 
