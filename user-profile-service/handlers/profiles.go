@@ -49,10 +49,16 @@ type UserCredentials struct {
 
 type FeedCredentials struct {
 	Method             string `json:"method"`
+	Fid                int    `json:"fid"`
 	AuthorId           int    `json:"author_id"`
 	ResourceIdentifier string `json:"resource_identifier"`
 	UpvoteCount        int    `json:"upvote_count"`
 	ShareCount         int    `json:"share_count"`
+}
+
+type RetrieveFeedParams struct {
+	Method string `json:"method"`
+	Page   int    `json:"page"`
 }
 
 type Params struct {
@@ -80,6 +86,10 @@ func (d *DynamicType) UnmarshalJSON(data []byte) error {
 	case "signin":
 		d.Value = new(UserCredentials)
 	case "postnew":
+		d.Value = new(FeedCredentials)
+	case "retrieve":
+		d.Value = new(RetrieveFeedParams)
+	case "upvote":
 		d.Value = new(FeedCredentials)
 	}
 	return json.Unmarshal(data, d.Value)
@@ -121,11 +131,16 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 				p.SignIn(rw, req, userCredentials)
 			}
 		case *FeedCredentials:
+			p.l.Println("switch feed credentials")
 			feedCredentials := *params.DynamicField.Value.(*FeedCredentials)
 			if feedCredentials.Method == "postnew" {
 				p.PostNewFeed(rw, req, feedCredentials)
+			} else if feedCredentials.Method == "upvote" {
+				p.UpvoteFeed(rw, req, feedCredentials)
 			}
-			p.l.Println("switch feed credentials")
+		case *RetrieveFeedParams:
+			retrieveFeedParams := *params.DynamicField.Value.(*RetrieveFeedParams)
+			p.RetrieveFeedsByPage(rw, req, retrieveFeedParams)
 		default:
 			p.l.Fatalln("unknown type")
 		}
@@ -186,6 +201,21 @@ func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, 
 	rw.Write(b.Bytes())
 }
 
-func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
+func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.Request, params RetrieveFeedParams) {
+	feeds := p.dao.GetFeedsByPage(params.Page)
+	// write response body
+	jsonFeeds, _ := json.Marshal(feeds)
+	rw.Write(jsonFeeds)
+}
 
+func (p *ProfileHandler) UpvoteFeed(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
+	p.dao.IncrementFeedUpvote(credentials.Fid)
+	// write response body
+	ret := map[string]string{
+		"errcode": "0",
+		"errmsg":  "ok",
+	}
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(ret)
+	rw.Write(b.Bytes())
 }
