@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // ProfileHandler is a http.Handler
@@ -49,10 +50,23 @@ type UserCredentials struct {
 
 type FeedCredentials struct {
 	Method             string `json:"method"`
+	Fid                int    `json:"fid"`
 	AuthorId           int    `json:"author_id"`
 	ResourceIdentifier string `json:"resource_identifier"`
 	UpvoteCount        int    `json:"upvote_count"`
 	ShareCount         int    `json:"share_count"`
+}
+
+type CommentCredentials struct {
+	Method      string `json:"method"`
+	FeedId      int    `json:"feed-id"`
+	CommenterId int    `json:"commenter-id"`
+	Content     string `json:"content"`
+}
+
+type RetrieveFeedParams struct {
+	Method string `json:"method"`
+	Page   int    `json:"page"`
 }
 
 type Params struct {
@@ -81,6 +95,12 @@ func (d *DynamicType) UnmarshalJSON(data []byte) error {
 		d.Value = new(UserCredentials)
 	case "postnew":
 		d.Value = new(FeedCredentials)
+	case "retrieve":
+		d.Value = new(RetrieveFeedParams)
+	case "upvote":
+		d.Value = new(FeedCredentials)
+	case "comment":
+		d.Value = new(CommentCredentials)
 	}
 	return json.Unmarshal(data, d.Value)
 }
@@ -121,11 +141,19 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 				p.SignIn(rw, req, userCredentials)
 			}
 		case *FeedCredentials:
+			p.l.Println("switch feed credentials")
 			feedCredentials := *params.DynamicField.Value.(*FeedCredentials)
 			if feedCredentials.Method == "postnew" {
 				p.PostNewFeed(rw, req, feedCredentials)
+			} else if feedCredentials.Method == "upvote" {
+				p.UpvoteFeed(rw, req, feedCredentials)
 			}
-			p.l.Println("switch feed credentials")
+		case *RetrieveFeedParams:
+			retrieveFeedParams := *params.DynamicField.Value.(*RetrieveFeedParams)
+			p.RetrieveFeedsByPage(rw, req, retrieveFeedParams)
+		case *CommentCredentials:
+			commentCredentials := *params.DynamicField.Value.(*CommentCredentials)
+			p.PostNewComment(rw, req, commentCredentials)
 		default:
 			p.l.Fatalln("unknown type")
 		}
@@ -172,10 +200,30 @@ func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, crede
 }
 
 func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
-	p.dao.InsertNewFeed(data_access.Feed{
+	newFeedId := p.dao.InsertNewFeed(data_access.Feed{
 		AuthorId:           credentials.AuthorId,
 		ResourceIdentifier: credentials.ResourceIdentifier,
 	})
+	// write response body
+	ret := map[string]string{
+		"errcode": "0",
+		"errmsg":  "ok",
+		"feed-id": strconv.Itoa(newFeedId),
+	}
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(ret)
+	rw.Write(b.Bytes())
+}
+
+func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.Request, params RetrieveFeedParams) {
+	feeds := p.dao.GetFeedsByPage(params.Page)
+	// write response body
+	jsonFeeds, _ := json.Marshal(feeds)
+	rw.Write(jsonFeeds)
+}
+
+func (p *ProfileHandler) UpvoteFeed(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
+	p.dao.IncrementFeedUpvote(credentials.Fid)
 	// write response body
 	ret := map[string]string{
 		"errcode": "0",
@@ -186,6 +234,18 @@ func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, 
 	rw.Write(b.Bytes())
 }
 
-func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
+func (p *ProfileHandler) PostNewComment(rw http.ResponseWriter, req *http.Request, credentials CommentCredentials) {
+	p.dao.InsertNewComment(data_access.Comment{
+		FeedId:      credentials.FeedId,
+		CommenterId: credentials.CommenterId,
+		Content:     credentials.Content,
+	})
 
+	ret := map[string]string{
+		"errcode": "0",
+		"errmsg":  "ok",
+	}
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(ret)
+	rw.Write(b.Bytes())
 }
