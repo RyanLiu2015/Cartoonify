@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./Post.css";
 import Avatar from "@material-ui/core/Avatar";
+import TextField from "@material-ui/core/TextField";
+import Button from '@material-ui/core/Button';
+import { Favorite, Chat } from '@material-ui/icons';
 
 export default function Post({ postId, user, username, caption, imageUrl }) {
+  const [like, setLike] = useState(false);
+  const [show, setShow] = useState(false);
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
 
@@ -57,6 +62,50 @@ export default function Post({ postId, user, username, caption, imageUrl }) {
         <strong>{username}</strong> {caption}
       </h4>
 
+      <div className="likeBox">
+        <Favorite onClick={() => {
+          setLike(!like);
+        }} style={{
+          marginRight: 15,
+          color: like ? 'red' : '#888'
+        }} />
+        <Chat onClick={() => {
+          setShow(true);
+        }} style={{
+          color: '#888'
+        }} />
+      </div>
+
+      {show && (
+        <div style={{
+          padding: '0 20px',
+          paddingBottom: 20
+        }}>
+          <TextField
+            id="outlined-multiline-flexible"
+            label="Comment"
+            multiline
+            maxRows={4}
+            style={{
+              width: '100%',
+              marginBottom: 30
+            }}
+            value={comment}
+            onChange={(e) => {
+              setComment(e.target.value)
+            }}
+          />
+          <Button onClick={() => {
+            let deepComments = [...comments];
+            deepComments.push({
+              username: 'admin',
+              text: comment
+            })
+            setComments(deepComments)
+            setShow(false);
+          }} size="small" color="primary" variant="contained">publish</Button>
+        </div>
+      )}
       {/* List of comments */}
       {
         <div className={comments.length > 0 ? "post__comments" : ""}>
@@ -67,6 +116,8 @@ export default function Post({ postId, user, username, caption, imageUrl }) {
           ))}
         </div>
       }
+
+
 
       {/* Form for adding comments
       {user && (
