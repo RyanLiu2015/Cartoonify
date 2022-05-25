@@ -59,8 +59,8 @@ type FeedCredentials struct {
 
 type CommentCredentials struct {
 	Method      string `json:"method"`
-	FeedId      int    `json:"feed-id"`
-	CommenterId int    `json:"commenter-id"`
+	FeedId      int    `json:"feed_id"`
+	CommenterId int    `json:"commenter_id"`
 	Content     string `json:"content"`
 }
 
@@ -71,7 +71,7 @@ type RetrieveFeedParams struct {
 
 type Params struct {
 	//SomeData     string      `json:"some-data"`
-	DynamicField DynamicType `json:"dynamic-field"`
+	DynamicField DynamicType `json:"dynamic_field"`
 	//OtherData    string      `json:"other-data"`
 }
 
@@ -223,7 +223,7 @@ func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.R
 }
 
 func (p *ProfileHandler) UpvoteFeed(rw http.ResponseWriter, req *http.Request, credentials FeedCredentials) {
-	p.dao.IncrementFeedUpvote(credentials.Fid)
+	p.dao.IncrementFeedUpvoteCount(credentials.Fid)
 	// write response body
 	ret := map[string]string{
 		"errcode": "0",
