@@ -3,23 +3,47 @@
     border: 1px solid lightgray;
     margin-bottom: 45px;
   }
+
+  .post__header {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+  }
+
+  .post__header h3 {
+    margin: 0px;
+  }
+
+  .post__avatar {
+    margin-right: 10px;
+  }
+
   .post__image {
     width: 100%;
     object-fit: contain;
     border-top: 1px solid lightgray;
     border-bottom: 1px solid lightgray;
   }
+
+  .tool_bar {
+    text-align: left;
+    margin: 4px 12px;
+  }
+
+  .like_numbers {
+    font-weight: bold;
+    font-size: small;
+    text-align: left;
+    margin: 0px 12px;
+    margin-bottom: 4px;
+  }
+
   .post__text {
+    font-size: small;
     font-weight: normal;
-    padding: 15px 20px;
-  }
-  .post__header {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-  }
-  .post__avatar {
-    margin-right: 10px;
+    text-align: left;
+    margin: 0px;
+    padding: 4px 12px;
   }
   
   .post__comments {
@@ -29,39 +53,39 @@
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
-    row-gap: 5px;
+    row-gap: 4px;
   }
-  
-  .comment__form {
-    margin: 0px 20px 20px 20px;
+
+  .post__comment_counts {
+
+  }
+
+  .post__time {
+    
   }
   
   .comment__wrapper {
     display: flex;
     width: inherit;
     background-color: #fafafa;
-    border-radius: 8px;
-    border: 1px solid lightgray;
-    padding: 8px;
+    padding: 4px 12px;
   }
   
-  .comment__wrapper input {
-    width: 70%;
+  .comment__Input {
+    width: 80%;
     border: none;
     background: transparent;
   }
   
-  .comment__wrapper input:focus {
+  .comment__Input:focus {
     border: none;
   }
   
-  .comment__wrapper button {
-    width: 30%;
+  .comment__Button {
     text-align: center;
+    /* font-family: sans-serif; */
+    /* font-weight: bold; */
+    /* font-size: small; */
   }
 
-  .likeBox{
-    text-align: left;
-    padding: 0 20px;
-    padding-bottom: 20px;
-  }
+  

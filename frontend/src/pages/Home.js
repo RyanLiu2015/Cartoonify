@@ -70,6 +70,8 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [content, setContent] = useState("");
+  
+  const [userId, setUserId] = useState(0);
 
   let navigate = useNavigate();
   let [menuActive, setMenuActive] = useState(false);

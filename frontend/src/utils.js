@@ -19,7 +19,7 @@ function toPost(type, url, data, callback) {
   xhr.send(data);
   xhr.onreadystatechange = function() {
     if (this.status === 200 && this.readyState === 4) {
-      callback(this.response);
+      callback(JSON.parse(xhr.responseText));
     }
   };
 }

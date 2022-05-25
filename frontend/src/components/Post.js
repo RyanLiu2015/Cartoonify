@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { makeStyles } from '@material-ui/core/styles';
 import "./Post.css";
+
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import Button from '@material-ui/core/Button';
+
 import { Favorite, Chat } from '@material-ui/icons';
 
-export default function Post({ postId, user, username, caption, imageUrl }) {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
+
+export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, commentNum, postTime, userId, username  }) {
   const [like, setLike] = useState(false);
-  const [show, setShow] = useState(false);
+  const [showPostOnly, setShowPostOnly] = useState(false);
+
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
 
@@ -30,17 +42,63 @@ export default function Post({ postId, user, username, caption, imageUrl }) {
   //   };
   // }, [postId]);
 
-  const postComment = (e) => {
-    e.preventDefault();
+  const postComment = () => {
+    const xhr = new XMLHttpRequest();
+    const url = "http://localhost:42069/user";
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    var sendJson = JSON.stringify(
+      {
+        "dynamic-field": {
+         "method": "comment",
+         "feed-id": postId,
+         "commenter-id": userId,
+         "content": comment
+        }
+      });
+    xhr.send(sendJson);
+    // var response = JSON.parse(xhr.response);
+    // alert(response);
 
-    // db.collection("posts").doc(postId).collection("comments").add({
-    //   text: comment,
-    //   username: user.displayName,
-    //   timestamp: fb.firestore.FieldValue.serverTimestamp(),
-    // });
-
+    xhr.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            console.log(response.Errcode);
+            console.log(response.Errmsg);
+            alert(xhr.responseText);
+        }
+    }
     setComment("");
   };
+
+  const handleLike = () => {
+    const xhr = new XMLHttpRequest();
+    const url = "http://localhost:42069/user";
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    var sendJson = JSON.stringify(
+      {
+        "dynamic-field": {
+          "method": "upvote",
+          "fid": postId
+        }
+      });
+    xhr.send(sendJson);
+    // var response = JSON.parse(xhr.response);
+    // alert(response);
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            console.log(response.Errcode);
+            console.log(response.Errmsg);
+            alert(xhr.responseText);
+        }
+    }
+    setLike(true);
+  };
+
+  const classes = useStyles();
 
   return (
     <div className="post">
@@ -48,64 +106,79 @@ export default function Post({ postId, user, username, caption, imageUrl }) {
         {/* Header - avatar with username */}
         <Avatar
           className="post__avatar"
-          alt={username}
+          alt={postAuthor}
           src="/static/images/avatar/1.jpg"
         />
-        <h3>{username}</h3>
+        <h3>{postAuthor}</h3>
       </div>
 
       {/* Image */}
       <img className="post__image" src={imageUrl} alt="" />
 
-      {/* Username + caption */}
-      <h4 className="post__text">
-        <strong>{username}</strong> {caption}
-      </h4>
-
-      <div className="likeBox">
-        <Favorite onClick={() => {
-          setLike(!like);
-        }} style={{
-          marginRight: 15,
-          color: like ? 'red' : '#888'
-        }} />
-        <Chat onClick={() => {
-          setShow(true);
-        }} style={{
-          color: '#888'
-        }} />
+      {/* Toolbar */}
+      <div className="tool_bar">
+        <Favorite 
+          onClick={handleLike}
+          style={{
+            marginRight: 15,
+            color: like ? 'red' : '#888'
+          }}
+        />
+        <Chat 
+          onClick={() => {}}
+          style={{color: '#888'}}
+        />
       </div>
 
-      {show && (
-        <div style={{
-          padding: '0 20px',
-          paddingBottom: 20
-        }}>
-          <TextField
-            id="outlined-multiline-flexible"
-            label="Comment"
-            multiline
-            maxRows={4}
-            style={{
-              width: '100%',
-              marginBottom: 30
-            }}
-            value={comment}
-            onChange={(e) => {
-              setComment(e.target.value)
-            }}
-          />
-          <Button onClick={() => {
-            let deepComments = [...comments];
-            deepComments.push({
-              username: 'admin',
-              text: comment
-            })
-            setComments(deepComments)
-            setShow(false);
-          }} size="small" color="primary" variant="contained">publish</Button>
-        </div>
-      )}
+      {/* Like Numbers */}
+      <div className="like_numbers">
+        <span>{like ? likeNum + 1 : likeNum} </span>
+        {likeNum == 1 || likeNum == 0 ? "like" : "likes"}
+      </div>
+
+      {/* Username + caption */}
+      <div className="post__text">
+        <strong>{postAuthor}</strong> {caption}
+      </div>
+
+      <div className="post__comment_counts">
+
+      </div>
+
+      <div className="post__time">
+
+      </div>
+
+      {/* <div style={{
+        padding: '0 20px',
+        paddingBottom: 20
+      }}>
+        <TextField
+          id="outlined-multiline-flexible"
+          label="Comment"
+          multiline
+          maxRows={4}
+          style={{
+            width: '100%',
+            marginBottom: 30
+          }}
+          value={comment}
+          onChange={(e) => {
+            setComment(e.target.value)
+          }}
+          InputProps={{ disableUnderline: true }}
+        />
+        <Button onClick={() => {
+          let deepComments = [...comments];
+          deepComments.push({
+            username: 'admin',
+            text: comment
+          })
+          setComments(deepComments)
+          
+        }} size="small" color="primary" variant="contained">publish</Button>
+      </div> */}
+
       {/* List of comments */}
       {
         <div className={comments.length > 0 ? "post__comments" : ""}>
@@ -117,30 +190,33 @@ export default function Post({ postId, user, username, caption, imageUrl }) {
         </div>
       }
 
+      {/* send comment tool bar */}
+      <div className="comment__wrapper">
+        <TextField
+          className="comment__Input"
+          id="outlined-multiline-flexible"
+          multiline
+          maxRows={4}
+          type="text"
+          placeholder="Add a comment..."
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          InputProps={{ disableUnderline: true }}
+        />
+        <div className={classes.root}>
+          <Button
+            className="comment__Button"
+            disabled={!comment}
+            size="small"
+            color="primary"
 
-
-      {/* Form for adding comments
-      {user && (
-        <form className="comment__form">
-          <div className="comment__wrapper">
-            <input
-              className="comment__Input"
-              type="text"
-              placeholder="Add a comment..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-            <button
-              className="comment__button text__button"
-              disabled={!comment}
-              onClick={postComment}
-              type="submit"
-            >
-              Post
-            </button>
-          </div>
-        </form>
-      )} */}
+            onClick={postComment}
+          >
+            Post
+          </Button>
+        </div>
+        
+      </div>
     </div>
   );
 }
