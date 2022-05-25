@@ -8,24 +8,25 @@ import (
 
 type Feed struct {
 	Fid                int    `json:"fid"`
-	AuthorId           int    `json:"author-id"`
-	AuthorUsername     string `json:"author-username"`
-	ResourceIdentifier string `json:"resource-identifier"`
-	UpvoteCount        int    `json:"upvote-count"`
-	CommentCount       int    `json:"comment-count"`
-	ShareCount         int    `json:"share-count"`
-	CreatedAt          string `json:"created-at"`
+	AuthorId           int    `json:"author_id"`
+	AuthorUsername     string `json:"author_username"`
+	ResourceIdentifier string `json:"resource_identifier"`
+	UpvoteCount        int    `json:"upvote_count"`
+	CommentCount       int    `json:"comment_count"`
+	ShareCount         int    `json:"share_count"`
+	CreatedAt          string `json:"created_at"`
 
-	FirstCommentContent   string `json:"first-comment-content"`
-	FirstCommentCommenter string `json:"first-comment-commenter"`
+	FirstCommentContent   string `json:"first_comment_content"`
+	FirstCommentCommenter string `json:"first_comment_commenter"`
 }
 
 type Comment struct {
-	Cid         int    `json:"cid"`
-	FeedId      int    `json:"feed-id"`
-	CommenterId int    `json:"commenter-id"`
-	Content     string `json:"content"`
-	CreatedAt   string `json:"created-at"`
+	Cid               int    `json:"cid"`
+	FeedId            int    `json:"feed_id"`
+	CommenterId       int    `json:"commenter_id"`
+	CommenterUsername string `json:"commenter_username"`
+	Content           string `json:"content"`
+	CreatedAt         string `json:"created_at"`
 }
 
 // InsertNewFeed return feed id
@@ -49,7 +50,6 @@ func (obj *UserDataAccessObject) GetFeedsByPage(page int) []Feed {
 	for i := 0; i < len(ret); i = i + 1 {
 		ret[i].AuthorUsername = authors[i].Username
 	}
-	//for _, elem := range ret {
 	for i := 0; i < len(ret); i = i + 1 {
 		thisFirstComment, err := obj.GetFirstComment(ret[i].Fid)
 		if err != nil {
@@ -65,11 +65,18 @@ func (obj *UserDataAccessObject) GetFeedsByPage(page int) []Feed {
 	return ret
 }
 
-func (obj *UserDataAccessObject) IncrementFeedUpvote(fid int) {
+func (obj *UserDataAccessObject) IncrementFeedUpvoteCount(fid int) {
 	var feed Feed
 	obj.db.Where(&Feed{Fid: fid}).First(&feed)
-	var currentUpvote int = feed.UpvoteCount
-	obj.db.Model(&Feed{}).Where("fid = ?", fid).Update("upvote_count", currentUpvote+1)
+	var currentUpvoteCount int = feed.UpvoteCount
+	obj.db.Model(&Feed{}).Where("fid = ?", fid).Update("upvote_count", currentUpvoteCount+1)
+}
+
+func (obj *UserDataAccessObject) IncrementFeedCommentCount(fid int) {
+	var feed Feed
+	obj.db.Where(&Feed{Fid: fid}).First(&feed)
+	var currentCommentCount int = feed.CommentCount
+	obj.db.Model(&Feed{}).Where("fid = ?", fid).Update("comment_count", currentCommentCount+1)
 }
 
 func (obj *UserDataAccessObject) GetFirstComment(fid int) (*Comment, error) {
@@ -82,9 +89,24 @@ func (obj *UserDataAccessObject) GetFirstComment(fid int) (*Comment, error) {
 }
 
 func (obj *UserDataAccessObject) InsertNewComment(comment Comment) {
+	// insert new entry in comment database
 	obj.db.Select("feed_id", "commenter_id", "content").Create(&comment)
+	// update comment count
+	obj.IncrementFeedCommentCount(comment.FeedId)
 }
 
-//func RetrieveCommentsByFeed(fid int) []Comment {
-//
-//}
+func (obj *UserDataAccessObject) RetrieveCommentsByFeed(fid int) []Comment {
+	var ret []Comment
+	obj.db.Raw("SELECT * FROM comments WHERE feed_id = ?", fid).Scan(&ret)
+	commenterIdList := make([]string, len(ret))
+	for i, elem := range ret {
+		commenterIdList[i] = strconv.Itoa(elem.CommenterId)
+	}
+	// find usernames using author_ids
+	var commenters []User
+	obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid IN (%s)", strings.Join(commenterIdList, ","))).Scan(&commenters)
+	for i := 0; i < len(ret); i = i + 1 {
+		ret[i].CommenterUsername = commenters[i].Username
+	}
+	return ret
+}
