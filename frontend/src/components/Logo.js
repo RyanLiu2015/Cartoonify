@@ -6,8 +6,11 @@ const WIDTH = 400;
 
 const useStyles = makeStyles(() => ({
     logoSty: {
+        // backgroundColor: "black",
+        // color: "white",
         width: WIDTH * 0.8,
-        marginTop: 10,
+        marginTop: 20,
+        // marginBottom: 200,
         marginLeft: 20,
     },
 }));
@@ -17,7 +20,7 @@ export default function Logo() {
 
     return (
         <div style={{ textAlign: "center", width: "100%" }}>
-            <img src={logo} className={logoSty} />
+            <img alt="Cartoonify" src={logo} className={logoSty} />
         </div>
     );
 }

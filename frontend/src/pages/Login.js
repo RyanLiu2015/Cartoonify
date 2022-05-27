@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import sty from './login.module.css';
-import {
-    useNavigate,
-} from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 
 import Header from '../components/Header.js';
 import Logo from "../components/Logo.js";
@@ -23,7 +21,12 @@ export default function Login() {
     const [cPwd, setCPwd] = useState('');
     const [email, setEmail] = useState('');
     const [isLogin, setIsLogin] = useState(true);
+
+    // const [currUser, setCurrUser] = useState('');
+    const [user, setUser] = useState("");
+
     let navigate = useNavigate();
+    // let history = useHistory();
 
     const handleSubmit = () => {
 
@@ -45,7 +48,7 @@ export default function Login() {
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 var sendJson = JSON.stringify(
                     {
-                        "dynamic-field": {
+                        "dynamic_field": {
                          "method": "signin",
                          "username": username,
                          "password": pwd
@@ -58,9 +61,15 @@ export default function Login() {
                 xhr.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         const response = JSON.parse(xhr.responseText);
-                        console.log(response.Errcode);
-                        console.log(response.Errmsg);
-                        alert(xhr.responseText);
+                        console.log(response);
+                        console.log(response.errcode);
+                        console.log(response.errmsg);
+                        if (response.errcode === "0") {
+                            alert("Login success!");
+                            localStorage.setItem('user', username);
+                            // navigate("/", { state : { user : username } });
+                        }
+                        
                     }
                 }
             }
@@ -90,7 +99,7 @@ export default function Login() {
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 var sendjson = JSON.stringify(
                     {
-                        "dynamic-field": {
+                        "dynamic_field": {
                          "method": "signup",
                          "username": username,
                          "password": pwd,
@@ -101,15 +110,18 @@ export default function Login() {
                 xhr.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         const response = JSON.parse(xhr.responseText);
-                        console.log(response.Errcode);
-                        console.log(response.Errmsg);
-                        alert(xhr.responseText);
+                        console.log(response);
+                        console.log(response.errcode);
+                        console.log(response.errmsg);
+                        if (response.errcode != "0") {
+                            alert("username or email already registered");
+                        }
                     }
                 }
             }
 
         }
-        navigate("/")
+        navigate("/");
     }
 
     const classes = useStyles();

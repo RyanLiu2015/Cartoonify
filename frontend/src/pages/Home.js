@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import Header from '../components/Header.js';
 import Logo from "../components/Logo.js";
@@ -61,8 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home() {
-  const username = window.localStorage.username;
+export default function Home(props) {
   const [before, setBefore] = useState("");
   const [after, setAfter] = useState("");
   const [percentage, setPercentage] = useState(0.5);
@@ -73,7 +70,27 @@ export default function Home() {
   
   const [userId, setUserId] = useState(0);
 
-  let navigate = useNavigate();
+  // let location = useLocation();
+  const [user, setUser] = useState("");
+
+  useEffect(() => {
+    var localUser = localStorage.getItem('user');
+    if (typeof localUser !== 'undefined' && localUser !== null) {
+      setUser(localUser);
+    }
+  }, []);
+
+  console.log(user);
+  
+  // console.log(location.state);
+
+  // useEffect(() => {
+  //   if (location.state.user) {
+  //     console.log(location.state.user);
+  //     setUser(location.state.user);
+  //   }
+  // }, []);
+
   let [menuActive, setMenuActive] = useState(false);
   useEffect(() => {
     toDataUrl(beforePlaceholder, (base64) => {
@@ -106,7 +123,7 @@ export default function Home() {
     xhr.setRequestHeader('Content-Type', 'application/json');
     var sendImg = JSON.stringify(
       {
-        "dynamic-field": {
+        "dynamic_field": {
           "method": "postnew",
           "author_id": 8,
           "resource_identifier": after

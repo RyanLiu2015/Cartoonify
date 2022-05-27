@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Typography, makeStyles, Button, IconButton, Drawer, Link, MenuItem } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { Link as RouterLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const HEIGHT = 64;
 
@@ -61,6 +62,8 @@ export default function Header() {
     });
 
     const { mobileView, drawerOpen } = state;
+
+    let navigate = useNavigate();
     
     useEffect(() => {
         const setResponsiveness = () => {
@@ -92,6 +95,16 @@ export default function Header() {
         <Typography variant="h6" component="h1" className={logo}>Cartoonify</Typography>
     );
 
+    // const handleClickDirect = ( { href } ) => {
+    //     navigate({
+    //         pathname: href,
+    //         search: createSearchParams({
+    //             user: username
+    //         }).toString()
+
+    //     });
+    // };
+
     const getMenuButtons = () => {
         return headersData.map(({ label, href }) => {
             return (
@@ -101,7 +114,8 @@ export default function Header() {
                         color: "inherit",
                         to: href,
                         component: RouterLink,
-                        className: menuButton
+                        className: menuButton,
+                        // onClick: handleClickDirect(href)
                     }}
                 >
                     {label}
@@ -147,11 +161,12 @@ export default function Header() {
             return (
             <Link
                 {...{
-                component: RouterLink,
-                to: href,
-                color: "inherit",
-                style: { textDecoration: "none" },
-                key: label,
+                    component: RouterLink,
+                    to: href,
+                    color: "inherit",
+                    style: { textDecoration: "none" },
+                    key: label,
+                    // onClick: handleClickDirect(href)
                 }}
             >
                 <MenuItem>{label}</MenuItem>

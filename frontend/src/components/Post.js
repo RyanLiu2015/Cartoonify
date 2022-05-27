@@ -49,10 +49,10 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
     xhr.setRequestHeader('Content-Type', 'application/json');
     var sendJson = JSON.stringify(
       {
-        "dynamic-field": {
+        "dynamic_field": {
          "method": "comment",
-         "feed-id": postId,
-         "commenter-id": userId,
+         "feed_id": postId,
+         "commenter_id": userId,
          "content": comment
         }
       });

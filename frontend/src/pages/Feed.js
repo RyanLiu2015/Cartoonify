@@ -60,7 +60,7 @@ export default function Feed() {
   const url = "http://localhost:42069/user";
   var sendjson = JSON.stringify(
     {
-      "dynamic-field": {
+      "dynamic_field": {
         "method": "retrieve",
         "page": 1
       }
