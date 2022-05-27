@@ -211,7 +211,7 @@ func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, 
 	ret := map[string]string{
 		"errcode": "0",
 		"errmsg":  "ok",
-		"feed-id": strconv.Itoa(newFeedId),
+		"feed_id": strconv.Itoa(newFeedId),
 	}
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(ret)
