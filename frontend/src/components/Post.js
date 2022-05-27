@@ -50,10 +50,10 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
     var sendJson = JSON.stringify(
       {
         "dynamic_field": {
-         "method": "comment",
-         "feed_id": postId,
-         "commenter_id": userId,
-         "content": comment
+          "method": "comment",
+          "feed_id": postId,
+          "commenter_id": userId,
+          "content": comment
         }
       });
     xhr.send(sendJson);

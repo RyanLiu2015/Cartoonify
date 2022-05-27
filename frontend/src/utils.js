@@ -12,9 +12,9 @@ function toDataUrl(url, callback) {
   xhr.send();
 }
 
-function toPost(type, url, data, callback) {
+function postRequest(url, data, callback) {
   var xhr = new XMLHttpRequest();
-  xhr.open(type, url);
+  xhr.open('POST', url);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.send(data);
   xhr.onreadystatechange = function() {
@@ -24,4 +24,4 @@ function toPost(type, url, data, callback) {
   };
 }
 
-export { toDataUrl, toPost };
+export { toDataUrl, postRequest };

@@ -86,7 +86,21 @@ export default function Header() {
         return (
             <Toolbar className={toolbar}>
                 {cartoonifyLogo}
-                <div>{getMenuButtons()}</div>
+                <div>
+                    {getMenuButtons()}
+                    <Button 
+                        className={menuButton}
+                        color="inherit"
+                        onClick={() => {
+                            // not finished yet, need check if user already logged out.
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('userId');
+                            alert("Log out successful!")
+                        }}
+                    >
+                        Log Out
+                    </Button>
+                </div>
             </Toolbar>
         );
     };

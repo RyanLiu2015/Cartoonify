@@ -11,7 +11,7 @@ import Chip from "@material-ui/core/Chip";
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
-import { toPost } from '../utils.js';
+import { postRequest } from '../utils.js';
 
 import sampleImg from "../feed-images/1.jpg"
 
@@ -36,26 +36,7 @@ export default function Feed() {
   const firstPage = pageNum == 1;
   const [lastPage, setLastPage] = useState(false);
 
-  const [posts, setPosts] = useState([
-    {
-      postId: 8,
-      postAuthor: "godtello",
-      imageUrl: sampleImg,
-      caption: "he center of France welcomes the heart of 21st-century coachbuilding. The DIVO is BUGATTI’s handbuilt hyper sports car that redefines coachbuilding for the modern era with exceptional design elements inside and",
-      likeNUm: 10,
-      commentNum: 10,
-      postTime: "11: 20",
-    },
-    {
-      postId: 8,
-      postAuthor: "aaron",
-      imageUrl: sampleImg,
-      caption: "Oh, I'm a God!",
-      likeNUm: 10,
-      commentNum: 10,
-      postTime: "11: 20",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
   
   const url = "http://localhost:42069/user";
   var sendjson = JSON.stringify(
@@ -67,7 +48,7 @@ export default function Feed() {
     });
   
   useEffect(() => {
-    toPost("POST", url, sendjson, (postJson) => {
+    postRequest(url, sendjson, (postJson) => {
       setPosts(
         postJson.map((post) => ({
           postId: post.fid,

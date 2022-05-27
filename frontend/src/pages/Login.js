@@ -64,11 +64,11 @@ export default function Login() {
                         console.log(response);
                         console.log(response.errcode);
                         console.log(response.errmsg);
-                        console.log(response.userId);
+                        console.log(response.uid);
                         if (response.errcode === "0") {
                             alert("Login success!");
                             localStorage.setItem('user', username);
-                            localStorage.setItem('userId', userId);
+                            localStorage.setItem('userId', response.uid);
                             // navigate("/", { state : { user : username } });
                         }
                         
@@ -115,11 +115,11 @@ export default function Login() {
                         console.log(response);
                         console.log(response.errcode);
                         console.log(response.errmsg);
-                        
+                        console.log(response.uid);
                         if (response.errcode === "0") {
                             alert("register successful!");
                             localStorage.setItem('user', username);
-                            localStorage.setItem('userId', userId);
+                            localStorage.setItem('userId', response.uid);
                         } else {
                             alert("username or email already registered");
                         }

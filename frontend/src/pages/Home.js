@@ -62,25 +62,32 @@ const useStyles = makeStyles((theme) => ({
 export default function Home(props) {
   const [before, setBefore] = useState("");
   const [after, setAfter] = useState("");
+  const [afterPath, setAfterPath] = useState("");
   const [percentage, setPercentage] = useState(0.5);
   const [modelID, setModelID] = useState(0);
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [content, setContent] = useState("");
+  const [caption, setCaption] = useState("");
   
-  const [userId, setUserId] = useState(0);
+  
 
   // let location = useLocation();
   const [user, setUser] = useState("");
+  const [userId, setUserId] = useState(0);
 
   useEffect(() => {
     var localUser = localStorage.getItem('user');
     if (typeof localUser !== 'undefined' && localUser !== null) {
       setUser(localUser);
     }
+    var localUserId = localStorage.getItem('userId');
+    if (typeof localUserId !== 'undefined' && localUserId !== null) {
+      setUserId(localUserId);
+    }
   }, []);
 
   console.log(user);
+  console.log(typeof userId);
   
   // console.log(location.state);
 
@@ -99,6 +106,7 @@ export default function Home(props) {
   }, []);
 
   useEffect(() => {
+    setAfterPath(afterPlaceholder);
     toDataUrl(afterPlaceholder, (base64) => {
       setAfter(base64);
     });
@@ -125,7 +133,7 @@ export default function Home(props) {
       {
         "dynamic_field": {
           "method": "postnew",
-          "author_id": 8,
+          "author_id": userId * 1,
           "resource_identifier": after
         }
       });
@@ -135,9 +143,23 @@ export default function Home(props) {
       if (this.readyState === 4 && this.status === 200) {
           const response = JSON.parse(xhr.responseText);
           console.log(response);
+          console.log(response.feed_id);
           console.log(response.errcode);
           console.log(response.errmsg);
           if (response.errcode === "0") {
+            var sendData = JSON.stringify(
+              {
+                "dynamic_field": {
+                  "method": "comment",
+                  "feed_id": response.feed_id,
+                  "commenter_id": userId * 1,
+                  "content": caption
+                }
+              }
+            );
+            postRequest(url, sendData, (response) => {
+              console.log(response);
+            });
             alert("shared successful");
           }
       }
@@ -242,11 +264,11 @@ export default function Home(props) {
               label="Text Content"
               multiline
               fullWidth
-              rows={4}
+              // rows={4}
               placeholder="Share your cartoonified image with optional text content here . . ."
-              value={content}
+              value={caption}
               onChange={(e) => {
-                setContent(e.target.value)
+                setCaption(e.target.value)
               }}
             />
           </DialogContent>
