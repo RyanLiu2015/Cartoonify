@@ -66,21 +66,21 @@ export default function Feed() {
       }
     });
   
-  // useEffect(() => {
-  //   toPost("POST", url, sendjson, (postJson) => {
-  //     setPosts(
-  //       postJson.map((post) => ({
-  //         postId: post.fid,
-  //         postAuthor: post.author-username,
-  //         imageUrl: post.resource-identifier,
-  //         likeNUm: post.upvote,
-  //         caption: post.first-comment-content,
-  //         commentNum: post.comment-count,
-  //         postTime: post.created-at,
-  //       }))
-  //     );
-  //   });
-  // }, []);
+  useEffect(() => {
+    toPost("POST", url, sendjson, (postJson) => {
+      setPosts(
+        postJson.map((post) => ({
+          postId: post.fid,
+          postAuthor: post.author_username,
+          imageUrl: post.resource_identifier,
+          likeNUm: post.upvote,
+          caption: post.first_comment_content,
+          commentNum: post.comment_count,
+          postTime: post.created_at,
+        }))
+      );
+    });
+  }, []);
 
   const classes = useStyles();
   return (
