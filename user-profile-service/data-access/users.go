@@ -37,17 +37,22 @@ func InitializeDatabase(conf MysqlConfig) (*UserDataAccessObject, error) {
 	}, nil
 }
 
-func (obj *UserDataAccessObject) InsertNewUser(user User) {
-	obj.db.Select("Username", "Password", "Email").Create(&user)
+// InsertNewUser returns uid
+func (obj *UserDataAccessObject) InsertNewUser(inUser User) int {
+	obj.db.Select("Username", "Password", "Email").Create(&inUser)
+	var outUser User
+	obj.db.Where("username = ?", fmt.Sprintf(inUser.Username)).First(&outUser)
+	return outUser.Uid
 }
 
-func (obj *UserDataAccessObject) ValidateExistingUser(inUser User) (bool, error) {
+// ValidateExistingUser returns uid
+func (obj *UserDataAccessObject) ValidateExistingUser(inUser User) (int, error) {
 	var outUser User
 	result := obj.db.Where("username = ?", fmt.Sprintf(inUser.Username)).First(&outUser)
 	if result.RowsAffected == 0 {
-		return false, errors.New(fmt.Sprintf("username '%s' not found\n", inUser.Username))
+		return -1, errors.New(fmt.Sprintf("username '%s' not found\n", inUser.Username))
 	} else if outUser.Password != inUser.Password {
-		return false, errors.New("password hash don't match")
+		return -1, errors.New("password hash don't match")
 	}
-	return true, nil
+	return outUser.Uid, nil
 }

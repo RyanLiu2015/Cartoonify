@@ -166,7 +166,7 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 // SignUp returns the products from the data store
 func (p *ProfileHandler) SignUp(rw http.ResponseWriter, req *http.Request, credentials UserCredentials) {
-	p.dao.InsertNewUser(data_access.User{
+	newUserId := p.dao.InsertNewUser(data_access.User{
 		Username: credentials.Username,
 		Password: credentials.Password,
 		Email:    credentials.Email,
@@ -176,13 +176,14 @@ func (p *ProfileHandler) SignUp(rw http.ResponseWriter, req *http.Request, crede
 	ret := map[string]string{
 		"errcode": "0",
 		"errmsg":  "ok",
+		"uid":     strconv.Itoa(newUserId),
 	}
 	retJson, _ := json.Marshal(ret)
 	rw.Write(retJson)
 }
 
 func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, credentials UserCredentials) {
-	_, err := p.dao.ValidateExistingUser(data_access.User{
+	uid, err := p.dao.ValidateExistingUser(data_access.User{
 		Username: credentials.Username,
 		Password: credentials.Password,
 	})
@@ -190,10 +191,12 @@ func (p *ProfileHandler) SignIn(rw http.ResponseWriter, req *http.Request, crede
 	ret := map[string]string{
 		"errcode": "0",
 		"errmsg":  "ok",
+		"uid":     strconv.Itoa(uid),
 	}
 	if err != nil {
 		ret["errcode"] = "1"
 		ret["errmsg"] = err.Error()
+		ret["uid"] = "-1"
 	}
 	retJson, _ := json.Marshal(ret)
 	rw.Write(retJson)
