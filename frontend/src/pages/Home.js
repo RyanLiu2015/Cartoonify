@@ -134,12 +134,14 @@ export default function Home(props) {
     xhr.onreadystatechange = function() {
       if (this.readyState === 4 && this.status === 200) {
           const response = JSON.parse(xhr.responseText);
-          console.log(response.Errcode);
-          console.log(response.Errmsg);
-          alert(xhr.responseText);
+          console.log(response);
+          console.log(response.errcode);
+          console.log(response.errmsg);
+          if (response.errcode === "0") {
+            alert("shared successful");
+          }
       }
-  }
-
+    }
     setDialogOpen(false);
   };
 
