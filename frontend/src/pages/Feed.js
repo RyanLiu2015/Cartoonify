@@ -31,6 +31,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+
 export default function Feed() {
   const [pageNum, setPageNum] = useState(1);
   const firstPage = pageNum == 1;
@@ -54,7 +55,7 @@ export default function Feed() {
           postId: post.fid,
           postAuthor: post.author_username,
           imageUrl: post.resource_identifier,
-          likeNum: post.upvote,
+          likeNum: post.upvote_count,
           caption: post.first_comment_content,
           commentNum: post.comment_count,
           postTime: post.created_at,
@@ -64,6 +65,23 @@ export default function Feed() {
   }, []);
 
   console.log(posts);
+
+  const [user, setUser] = useState("");
+  const [userId, setUserId] = useState(0);
+
+  useEffect(() => {
+    var localUser = localStorage.getItem('user');
+    if (typeof localUser !== 'undefined' && localUser !== null) {
+      setUser(localUser);
+    }
+    var localUserId = localStorage.getItem('userId');
+    if (typeof localUserId !== 'undefined' && localUserId !== null) {
+      setUserId(localUserId);
+    }
+  }, []);
+
+  console.log(user);
+  console.log(userId);
 
   const classes = useStyles();
   return (
@@ -82,7 +100,8 @@ export default function Feed() {
               caption={post.caption}
               commentNum={post.commentNum}
               postTime={post.postTime}
-              
+              userId={userId}
+              username={user}
             />
           ))}
         </div>

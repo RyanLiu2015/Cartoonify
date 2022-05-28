@@ -5,8 +5,13 @@ import "./Post.css";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import { Favorite, Chat } from '@material-ui/icons';
+import { postRequest } from "../utils.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,33 +19,22 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
     },
   },
+  img: {
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginTop: 10,
+    marginBottom: 10,
+  },
 }));
 
 export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, commentNum, postTime, userId, username  }) {
   const [like, setLike] = useState(false);
   const [showPostOnly, setShowPostOnly] = useState(false);
 
-  const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
-
-  // useEffect(() => {
-  //   let unsubscribe;
-
-  //   if (postId) {
-  //     unsubscribe = db
-  //       .collection("posts")
-  //       .doc(postId)
-  //       .collection("comments")
-  //       .orderBy("timestamp", "desc")
-  //       .onSnapshot((snapshot) => {
-  //         setComments(snapshot.docs.map((doc) => doc.data()));
-  //       });
-  //   }
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, [postId]);
+  const [comments, setComments] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   console.log(likeNum);
 
@@ -54,7 +48,7 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
         "dynamic_field": {
           "method": "comment",
           "feed_id": postId,
-          "commenter_id": userId,
+          "commenter_id": userId * 1,
           "content": comment
         }
       });
@@ -66,9 +60,14 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
         if (this.readyState === 4 && this.status === 200) {
             const response = JSON.parse(xhr.responseText);
             console.log(response);
+            // if (response.errcode === 0) {
+            //   // setComments(currComments => [...currComments, comment]);
+            // }
+            
             // alert(xhr.responseText);
         }
     }
+
     setComment("");
   };
 
@@ -79,7 +78,7 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
     xhr.setRequestHeader('Content-Type', 'application/json');
     var sendJson = JSON.stringify(
       {
-        "dynamic-field": {
+        "dynamic_field": {
           "method": "upvote",
           "fid": postId
         }
@@ -99,7 +98,52 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
     setLike(true);
   };
 
+  const handleOpen = () => {
+    const url = "http://localhost:42069/user";
+    var sendJson = JSON.stringify(
+      {
+        "dynamic_field": {
+          "method": "retrieve_comments",
+          "fid": postId
+        }
+      });
+
+    postRequest(url, sendJson, (response) => {
+      setComments(
+        response.map((cmts) => ({
+          username: cmts.commenter_username,
+          content: cmts.content,
+        }))
+      );
+    });
+    console.log(comments);
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
+  };
+
+
+
   const classes = useStyles();
+
+  const showThreeComments = () => {
+    if (commentNum > 1 && commentNum < 6) {
+      return (
+        <div className="post__comments">
+          div
+        </div>
+      );
+    } else {
+      return (
+        <div className="post__comment_counts">
+          View all <span>{commentNum - 1}</span> {commentNum == 1 || commentNum == 2 ? "comment" : "comments"}
+        </div>
+      );
+      
+    }
+  };
 
   return (
     <div className="post">
@@ -142,25 +186,26 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
         <strong>{postAuthor}</strong> {caption}
       </div>
 
-      {commentNum > 1 && <div className="post__comment_counts">
+      {commentNum > 1 && 
+        <div className="post__comment_counts" onClick={handleOpen}>
           View all <span>{commentNum - 1}</span> {commentNum == 1 || commentNum == 2 ? "comment" : "comments"}
-      </div>}
+        </div>
+      }
 
       <div className="post__time">
           {postTime}
       </div>
 
-      {/* List of comments
-      {
+      {/* List of comments */}
+      {/* {
         <div className={comments.length > 0 ? "post__comments" : ""}>
-          {comments.map((comment) => (
+          {comments.map((cmt) => (
             <p>
               <strong>{comment.username}</strong> {comment.text}
             </p>
           ))}
         </div>
       } */}
-
 
       {/* send comment tool bar */}
       <div className="comment__wrapper">
@@ -187,8 +232,53 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
             Post
           </Button>
         </div>
-        
       </div>
+
+      <Dialog open={dialogOpen} onClose={handleClose} >
+        <DialogContent>
+          <img src={imageUrl} className={classes.img} />
+          <div className="post__comments">
+            {comments.map((cmt) => (
+              <p>
+                <strong>{comment.username}</strong> {comment.content}
+              </p>
+            ))}
+          </div>
+          <div className="comment__wrapper">
+            <TextField
+              className="comment__Input"
+              id="outlined-multiline-flexible"
+              multiline
+              maxRows={4}
+              type="text"
+              placeholder="Add a comment..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              InputProps={{ disableUnderline: true }}
+            />
+            <div className={classes.root}>
+              <Button
+                className="comment__Button"
+                disabled={!comment}
+                size="small"
+                color="primary"
+                onClick={postComment}
+              >
+                Post
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Close
+          </Button>
+          {/* <Button onClick={handleShareFeed} color="primary">
+            Share
+          </Button> */}
+        </DialogActions>
+      </Dialog>
+  
     </div>
   );
 }
