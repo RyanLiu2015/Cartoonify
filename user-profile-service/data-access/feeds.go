@@ -45,10 +45,10 @@ func (obj *UserDataAccessObject) GetFeedsByPage(page int) []Feed {
 		authorIdList[i] = strconv.Itoa(elem.AuthorId)
 	}
 	// find usernames using author_ids
-	var authors []User
-	obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid IN (%s)", strings.Join(authorIdList, ","))).Scan(&authors)
 	for i := 0; i < len(ret); i = i + 1 {
-		ret[i].AuthorUsername = authors[i].Username
+		var thisAuthor User
+		obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid = %s)", authorIdList[i])).Scan(thisAuthor)
+		ret[i].AuthorUsername = thisAuthor.Username
 	}
 	for i := 0; i < len(ret); i = i + 1 {
 		thisFirstComment, err := obj.GetFirstComment(ret[i].Fid)
