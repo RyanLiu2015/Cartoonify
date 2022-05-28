@@ -3,7 +3,6 @@ package data_access
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 type Feed struct {
@@ -95,7 +94,7 @@ func (obj *UserDataAccessObject) InsertNewComment(comment Comment) {
 	obj.IncrementFeedCommentCount(comment.FeedId)
 }
 
-func (obj *UserDataAccessObject) RetrieveCommentsByFeed(fid int) []Comment {
+func (obj *UserDataAccessObject) GetCommentsByFeed(fid int) []Comment {
 	var ret []Comment
 	obj.db.Raw("SELECT * FROM comments WHERE feed_id = ?", fid).Scan(&ret)
 	commenterIdList := make([]string, len(ret))
@@ -103,10 +102,10 @@ func (obj *UserDataAccessObject) RetrieveCommentsByFeed(fid int) []Comment {
 		commenterIdList[i] = strconv.Itoa(elem.CommenterId)
 	}
 	// find usernames using author_ids
-	var commenters []User
-	obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid IN (%s)", strings.Join(commenterIdList, ","))).Scan(&commenters)
 	for i := 0; i < len(ret); i = i + 1 {
-		ret[i].CommenterUsername = commenters[i].Username
+		var thisCommenter User
+		obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid = %s", commenterIdList[i])).Scan(&thisCommenter)
+		ret[i].CommenterUsername = thisCommenter.Username
 	}
 	return ret
 }

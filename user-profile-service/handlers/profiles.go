@@ -69,6 +69,11 @@ type RetrieveFeedParams struct {
 	Page   int    `json:"page"`
 }
 
+type RetrieveCommentParams struct {
+	Method string `json:"method"`
+	Fid    int    `json:"feed_id"`
+}
+
 type Params struct {
 	//SomeData     string      `json:"some-data"`
 	DynamicField DynamicType `json:"dynamic_field"`
@@ -101,6 +106,8 @@ func (d *DynamicType) UnmarshalJSON(data []byte) error {
 		d.Value = new(FeedCredentials)
 	case "comment":
 		d.Value = new(CommentCredentials)
+	case "retrieve_comments":
+		d.Value = new(RetrieveCommentParams)
 	}
 	return json.Unmarshal(data, d.Value)
 }
@@ -154,6 +161,9 @@ func (p *ProfileHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case *CommentCredentials:
 			commentCredentials := *params.DynamicField.Value.(*CommentCredentials)
 			p.PostNewComment(rw, req, commentCredentials)
+		case *RetrieveCommentParams:
+			retrieveCommentParams := *params.DynamicField.Value.(*RetrieveCommentParams)
+			p.RetrieveCommentsByFeed(rw, req, retrieveCommentParams)
 		default:
 			p.l.Fatalln("unknown type")
 		}
@@ -220,6 +230,13 @@ func (p *ProfileHandler) PostNewFeed(rw http.ResponseWriter, req *http.Request, 
 
 func (p *ProfileHandler) RetrieveFeedsByPage(rw http.ResponseWriter, req *http.Request, params RetrieveFeedParams) {
 	feeds := p.dao.GetFeedsByPage(params.Page)
+	// write response body
+	jsonFeeds, _ := json.Marshal(feeds)
+	rw.Write(jsonFeeds)
+}
+
+func (p *ProfileHandler) RetrieveCommentsByFeed(rw http.ResponseWriter, req *http.Request, params RetrieveCommentParams) {
+	feeds := p.dao.GetCommentsByFeed(params.Fid)
 	// write response body
 	jsonFeeds, _ := json.Marshal(feeds)
 	rw.Write(jsonFeeds)
