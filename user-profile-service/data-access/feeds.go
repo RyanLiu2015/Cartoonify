@@ -104,7 +104,7 @@ func (obj *UserDataAccessObject) GetCommentsByFeed(fid int) []Comment {
 	// find usernames using author_ids
 	for i := 0; i < len(ret); i = i + 1 {
 		var thisCommenter User
-		obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid = %s", commenterIdList)).Scan(&thisCommenter)
+		obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid = %s", commenterIdList[i])).Scan(&thisCommenter)
 		ret[i].CommenterUsername = thisCommenter.Username
 	}
 	return ret
