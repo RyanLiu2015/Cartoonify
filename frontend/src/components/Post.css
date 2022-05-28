@@ -7,7 +7,7 @@
   .post__header {
     display: flex;
     align-items: center;
-    padding: 4px 12px;
+    margin: 12px;
   }
 
   .post__header h3 {
@@ -42,8 +42,7 @@
     font-size: small;
     font-weight: normal;
     text-align: left;
-    margin: 0px;
-    padding: 4px 12px;
+    margin: 4px 12px;
   }
   
   .post__comments {
@@ -57,18 +56,30 @@
   }
 
   .post__comment_counts {
-
+    font-size: x-small;
+    text-align: left;
+    margin: 4px 12px;
+    color: #555555;
+  }
+  
+  .post__comment_counts:focus {
+    color: #8E8E8E;
   }
 
   .post__time {
-    
+    font-size: xx-small;
+    text-align: left;
+    margin: 4px 12px;
+    color: #8E8E8E;
   }
   
   .comment__wrapper {
     display: flex;
     width: inherit;
     background-color: #fafafa;
+    margin-top: 4px;
     padding: 4px 12px;
+    
   }
   
   .comment__Input {

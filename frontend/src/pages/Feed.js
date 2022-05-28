@@ -54,7 +54,7 @@ export default function Feed() {
           postId: post.fid,
           postAuthor: post.author_username,
           imageUrl: post.resource_identifier,
-          likeNUm: post.upvote,
+          likeNum: post.upvote,
           caption: post.first_comment_content,
           commentNum: post.comment_count,
           postTime: post.created_at,
@@ -62,6 +62,8 @@ export default function Feed() {
       );
     });
   }, []);
+
+  console.log(posts);
 
   const classes = useStyles();
   return (
@@ -76,7 +78,7 @@ export default function Feed() {
               postId={post.postId}
               postAuthor={post.postAuthor}
               imageUrl={post.imageUrl}
-              likeNum={post.likeNUm}
+              likeNum={post.likeNum}
               caption={post.caption}
               commentNum={post.commentNum}
               postTime={post.postTime}

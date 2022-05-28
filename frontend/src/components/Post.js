@@ -42,6 +42,8 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
   //   };
   // }, [postId]);
 
+  console.log(likeNum);
+
   const postComment = () => {
     const xhr = new XMLHttpRequest();
     const url = "http://localhost:42069/user";
@@ -63,9 +65,8 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
     xhr.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
             const response = JSON.parse(xhr.responseText);
-            console.log(response.Errcode);
-            console.log(response.Errmsg);
-            alert(xhr.responseText);
+            console.log(response);
+            // alert(xhr.responseText);
         }
     }
     setComment("");
@@ -141,45 +142,15 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
         <strong>{postAuthor}</strong> {caption}
       </div>
 
-      <div className="post__comment_counts">
-
-      </div>
+      {commentNum > 1 && <div className="post__comment_counts">
+          View all <span>{commentNum - 1}</span> {commentNum == 1 || commentNum == 2 ? "comment" : "comments"}
+      </div>}
 
       <div className="post__time">
-
+          {postTime}
       </div>
 
-      {/* <div style={{
-        padding: '0 20px',
-        paddingBottom: 20
-      }}>
-        <TextField
-          id="outlined-multiline-flexible"
-          label="Comment"
-          multiline
-          maxRows={4}
-          style={{
-            width: '100%',
-            marginBottom: 30
-          }}
-          value={comment}
-          onChange={(e) => {
-            setComment(e.target.value)
-          }}
-          InputProps={{ disableUnderline: true }}
-        />
-        <Button onClick={() => {
-          let deepComments = [...comments];
-          deepComments.push({
-            username: 'admin',
-            text: comment
-          })
-          setComments(deepComments)
-          
-        }} size="small" color="primary" variant="contained">publish</Button>
-      </div> */}
-
-      {/* List of comments */}
+      {/* List of comments
       {
         <div className={comments.length > 0 ? "post__comments" : ""}>
           {comments.map((comment) => (
@@ -188,7 +159,8 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
             </p>
           ))}
         </div>
-      }
+      } */}
+
 
       {/* send comment tool bar */}
       <div className="comment__wrapper">

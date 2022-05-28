@@ -29,7 +29,7 @@ import afterPlaceholder from "../images/after.jpg";
 
 import { triggerBase64Download } from "react-base64-downloader";
 import { transform } from "../api.js";
-import { toDataUrl } from "../utils.js";
+import { toDataUrl, postRequest } from "../utils.js";
 
 const LOAD_SIZE = 450;
 const WIDTH = 400;
@@ -87,17 +87,8 @@ export default function Home(props) {
   }, []);
 
   console.log(user);
-  console.log(typeof userId);
+  console.log(userId);
   
-  // console.log(location.state);
-
-  // useEffect(() => {
-  //   if (location.state.user) {
-  //     console.log(location.state.user);
-  //     setUser(location.state.user);
-  //   }
-  // }, []);
-
   let [menuActive, setMenuActive] = useState(false);
   useEffect(() => {
     toDataUrl(beforePlaceholder, (base64) => {
@@ -151,7 +142,7 @@ export default function Home(props) {
               {
                 "dynamic_field": {
                   "method": "comment",
-                  "feed_id": response.feed_id,
+                  "feed_id": response.feed_id * 1,
                   "commenter_id": userId * 1,
                   "content": caption
                 }
