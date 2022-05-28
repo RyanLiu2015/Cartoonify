@@ -47,7 +47,7 @@ func (obj *UserDataAccessObject) GetFeedsByPage(page int) []Feed {
 	// find usernames using author_ids
 	for i := 0; i < len(ret); i = i + 1 {
 		var thisAuthor User
-		obj.db.Raw(fmt.Sprintf("SELECT * from users WHERE uid = %s)", authorIdList[i])).Scan(thisAuthor)
+		obj.db.Raw(fmt.Sprintf("SELECT * FROM users WHERE uid = %s", authorIdList[i])).Scan(&thisAuthor)
 		ret[i].AuthorUsername = thisAuthor.Username
 	}
 	for i := 0; i < len(ret); i = i + 1 {
