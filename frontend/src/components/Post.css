@@ -48,11 +48,13 @@
   .post__comments {
     border-top: 1px solid lightgray;
     border-bottom: 1px solid lightgray;
-    padding: 10px 20px 10px 20px;
-    margin-bottom: 20px;
+    margin: 5px 0px;
     display: flex;
     flex-direction: column;
-    row-gap: 4px;
+  }
+
+  .post__comments p {
+    margin: 5px 12px;
   }
 
   .post__comment_counts {

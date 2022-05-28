@@ -92,31 +92,38 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
             const response = JSON.parse(xhr.responseText);
             console.log(response.Errcode);
             console.log(response.Errmsg);
-            alert(xhr.responseText);
+            // alert(xhr.responseText);
         }
     }
     setLike(true);
   };
 
   const handleOpen = () => {
+    const xhr = new XMLHttpRequest();
     const url = "http://localhost:42069/user";
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
     var sendJson = JSON.stringify(
       {
         "dynamic_field": {
           "method": "retrieve_comments",
-          "fid": postId
+          "feed_id": postId
         }
       });
 
-    postRequest(url, sendJson, (response) => {
-      setComments(
-        response.map((cmts) => ({
-          username: cmts.commenter_username,
-          content: cmts.content,
-        }))
-      );
-    });
-    console.log(comments);
+    xhr.send(sendJson);
+    xhr.onreadystatechange = function() {
+      if (this.readyState === 4 && this.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        console.log(response);
+        setComments(
+          response.map((cmts) => ({
+            username: cmts.commenter_username,
+            content: cmts.content,
+          }))
+        );
+      }
+    }
     setDialogOpen(true);
   };
 
@@ -125,25 +132,9 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
   };
 
 
+  console.log(comments);
 
   const classes = useStyles();
-
-  const showThreeComments = () => {
-    if (commentNum > 1 && commentNum < 6) {
-      return (
-        <div className="post__comments">
-          div
-        </div>
-      );
-    } else {
-      return (
-        <div className="post__comment_counts">
-          View all <span>{commentNum - 1}</span> {commentNum == 1 || commentNum == 2 ? "comment" : "comments"}
-        </div>
-      );
-      
-    }
-  };
 
   return (
     <div className="post">
@@ -170,7 +161,7 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
           }}
         />
         <Chat 
-          onClick={() => {}}
+          onClick={handleOpen}
           style={{color: '#888'}}
         />
       </div>
@@ -195,17 +186,6 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
       <div className="post__time">
           {postTime}
       </div>
-
-      {/* List of comments */}
-      {/* {
-        <div className={comments.length > 0 ? "post__comments" : ""}>
-          {comments.map((cmt) => (
-            <p>
-              <strong>{comment.username}</strong> {comment.text}
-            </p>
-          ))}
-        </div>
-      } */}
 
       {/* send comment tool bar */}
       <div className="comment__wrapper">
@@ -240,7 +220,7 @@ export default function Post({ postId, postAuthor, imageUrl, likeNum, caption, c
           <div className="post__comments">
             {comments.map((cmt) => (
               <p>
-                <strong>{comment.username}</strong> {comment.content}
+                <strong>{cmt.username}</strong> {cmt.content}
               </p>
             ))}
           </div>
